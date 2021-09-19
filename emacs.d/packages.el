@@ -51,7 +51,13 @@
 
 
 (use-package elfeed
-  :bind (("C-x w" . elfeed))
+  :bind (("C-x w" . elfeed)
+         :map elfeed-search-mode-map
+         ("R" . elfeed-update)
+         :map elfeed-show-mode-map
+         ("J" . elfeed-show-next)
+         ("K" . elfeed-show-prev))
+        
   :config
   (setq browse-url-browser-function 'w3m-browse-url)
   (setq elfeed-feeds
@@ -61,16 +67,6 @@
 	      ("https://emacsredux.com/atom.xml" emacsredux)
 	      ("http://ergoemacs.org/emacs/blog.xml" ergoemacs)
 	      ("https://irreal.org/blog/?feed=atom" irreal))))
-
-(use-package elfeed-goodies
-  :defer t
-  :bind (:map elfeed-show-mode-map
-              ("J" . elfeed-goodies/split-show-next)
-              ("K" . elfeed-goodies/split-show-prev))
-  :config
-  (elfeed-goodies/setup)
-  (setq elfeed-goodies/entry-pane-size .6))
-
 
 (use-package w3m)
 
@@ -87,4 +83,4 @@
   :init (message "Carregando o magit")
   :config
   (message "Magit carregado"))
-                
+
