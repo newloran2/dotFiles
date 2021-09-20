@@ -8,6 +8,17 @@
     (message "Aborting")))
 
 
+
+;;elfeed utils
+(defun cle/open-elfeed-filtered (filter)
+  "abre o elfeed com um filtro infomado"
+  (interactive)
+  (elfeed)
+  (elfeed-search-set-filter filter)
+  )
+
+
+
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
