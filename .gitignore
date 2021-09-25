@@ -1,0 +1,11 @@
+/emacs.d/agenda/
+/emacs.d/transient/
+/emacs.d/emms/
+/emacs.d/quelpa/
+/emacs.d/request/
+/emacs.d/snippets/
+/emacs.d/straight/
+/emacs.d/tramp
+/emacs.d/bookmarks
+/emacs.d/auto-save*
+/emacs.d/#.*

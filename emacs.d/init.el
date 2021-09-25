@@ -3,5 +3,5 @@
 (setq custom-file (expand-file-name "config.el" user-emacs-directory))
 (setq packages-file (expand-file-name "packages.el" user-emacs-directory))
 (when (file-exists-p custom-file) (load custom-file))
-(when (file-exists-p packages-file) (load packages-file))
 (when (file-exists-p functions-file) (load functions-file))
+(when (file-exists-p packages-file) (load packages-file))

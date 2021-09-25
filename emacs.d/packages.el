@@ -54,21 +54,23 @@
   :bind (("C-x w" . cle/hydra-elfeed/body)
          :map elfeed-search-mode-map
          ("R" . elfeed-update)
-         :map elfeed-show-mode-map
-         ("J" . elfeed-show-next)
-         ("K" . elfeed-show-prev))
-        
+         ("B" . ar/elfeed-search-browse-background-url))
   :config
-  (setq browse-url-browser-function 'w3m-browse-url)
+  (setq browse-url-browser-function 'eww-browse-url)
+  ;;(setq browse-url-browser-function 'w3m-browse-url)
   (setq elfeed-feeds
         '( 
           ("https://www.xboxpower.com.br/feed/" xbox)
+          ("https://www.trueachievements.com/newsrss.aspx" xbox)
+          ("https://www.promocaogames.com.br/feeds/posts/default" xbox)
           ("https://sachachua.com/blog/feed/" sasha_Chua emacs)
           ("https://www.reddit.com/r/macmini/.rss" reddit mac)
           ("https://macmagazine.com.br/feed/" mac)
-          ("https://emacsredux.com/atom.xml" mac)
+          ("https://emacsredux.com/atom.xml" emacs)
           ("http://ergoemacs.org/emacs/blog.xml" mac)
-          ("https://irreal.org/blog/?feed=atom" mac))))
+          ("https://irreal.org/blog/?feed=atom" mac)
+          ("https://www.youtube.com/feeds/videos.xml?channel_id=UCA7bPwBQFCzVlTavNy5U3_g" youtube))
+  ))
 
 (defhydra cle/hydra-elfeed ()
   "Elfeed"
@@ -79,14 +81,19 @@
 )
 
 
-(use-package w3m)
+(use-package w3m
+  :config
+  (setq w3m-toggle-inline-images-permanently nil)) ;; desliga a exibição de imagens no w3m
 
 
 (use-package org-bullets :hook (org-mode . org-bullets-mode))
 (use-package ace-jump-mode :bind("C-c c" . ace-jump-word-mode))
 
 ;;snippets
-(use-package yasnippet)
+(use-package yasnippet
+  :hook
+  ('emacs-lisp-mode-hook '(yas-minor-mode))
+  ('go-mode-hook '(yas-minor-mode)))
 (use-package yasnippet-snippets)
 
 ;; git
@@ -95,11 +102,15 @@
   :config
   (message "Magit carregado"))
 
-;; movimento entre janelas
-(use-package ace-window :bind ("M-o" . 'ace-window))
 
 
-;;hydra
+(use-package avy
+  :bind
+  ("M-g" . 'avy-goto-char-timer)
+  ("M-o" . 'ace-window))
+
+;;Hydra
 (use-package hydra)
-;;apenas para testar package sem necessáriamente instalar
+;;Apenas Para Testar Package Sem Necessáriamente instalar
 (use-package try)
+
