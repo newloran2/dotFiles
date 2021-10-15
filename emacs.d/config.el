@@ -1,16 +1,23 @@
-(setq inhibit-startup-message t)
+ (setq inhibit-startup-message t)
 
 (when (fboundp 'tool-bar-mode) (tool-bar-mode -1))
 (when (fboundp 'menu-bar-mode) (menu-bar-mode -1))
 (when (fboundp 'scroll-bar-mode) (scroll-bar-mode -1))
-(set-frame-font "Source Code Pro 14")
+(set-frame-font "Source Code Pro 12")
 (defalias 'yes-or-no-p 'y-or-n-p)
+(electric-pair-mode 1)
+(setq electric-pair-preserve-balance nil)
+
 (setq shr-inhibit-images t) ;; sem imagens no emacs grafico
 (recentf-mode t)
 (setq recentf-max-saved-items 100)
 (setq recentf-exclude '("~/.emacs.d/elpa"))
-(global-set-key "\C-x\ \C-r" 'ido-recentf-open)
-
+;;(global-set-key "\C-x\ \C-r" 'ido-recentf-open)
+(global-set-key (kbd "C-c s") (lambda() (interactive) (switch-to-buffer "*scratch*")))
+(global-set-key (kbd "C-c a") 'org-agenda)
+;;evil
+(setq display-line-numbers-type 'relative)
+(global-display-line-numbers-mode)
 
 ;; Put backup files neatly away                                                 
 (let ((backup-dir "~/.emacs.d/backups")
@@ -38,6 +45,12 @@
 (setq c-basic-offset 4) 
 (c-set-offset 'comment-intro 0)
 
+
+
+;;agenda
+(setq org-agenda-files (list "~/.emacs.d/agenda/todo.org"
+                             "~/.emacs.d/agenda/work.org"
+                             "~/.emacs.d/agenda/home.org"))
 
 
 
@@ -71,8 +84,9 @@
  ;; If there is more than one, they won't work right.
  '(custom-safe-themes
    '("c1284dd4c650d6d74cfaf0106b8ae42270cab6c58f78efc5b7c825b6a4580417" "b6269b0356ed8d9ed55b0dcea10b4e13227b89fd2af4452eee19ac88297b0f99" "c8b83e7692e77f3e2e46c08177b673da6e41b307805cd1982da9e2ea2e90e6d7" default))
+ '(evil-undo-system 'undo-tree)
  '(package-selected-packages
-   '(ydra mu4e expand-region hydra ace-window elcast try spray popup-el popup google-translate magit plantuml-mode elfeed-goodies yasnippet-snippets yasnippet go-mode company which-key lsp-ui lsp-mode company-quickhelp monokai-pro-them shell-pop ace-jump-mode ace-jump swift-mode org-bullets w3m w3 elfeed use-package))
+   '(restclient helm-mode helm dumb-jump xwwp emms projectile eshell-toggle eshel-toggle undo-tree undo-fu evil lsp-sourcekit yaml-mode rust-mode ydra mu4e expand-region hydra ace-window elcast try spray popup-el popup google-translate magit plantuml-mode elfeed-goodies yasnippet-snippets yasnippet go-mode company which-key lsp-ui lsp-mode company-quickhelp monokai-pro-them shell-pop ace-jump-mode ace-jump swift-mode org-bullets w3m w3 elfeed use-package))
  '(safe-local-variable-values '((git-commit-major-mode . git-commit-elisp-text-mode))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.

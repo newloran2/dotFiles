@@ -1,3 +1,4 @@
+(setq comp-deferred-compilation t)
 ;; definição do arquivo de inicialização separado para evitar que o emacs escreva nele
 (setq functions-file (expand-file-name "functions.el" user-emacs-directory))
 (setq custom-file (expand-file-name "config.el" user-emacs-directory))

@@ -63,6 +63,17 @@ See `elfeed-play-with-mpv'."
         (forward-line))))
 
 
+(defun cle/elfeed-add-to-emms()
+  "adiciona a url do podcast no elfeed na playlist do emms"
+  (interactive)
+  (let ((enclosure (nth 0 (elfeed-entry-enclosures elfeed-show-entry))))
+    (when (and enclosure
+               (string-match-p
+                "audio/mpeg"
+                (nth 1 enclosure)))
+      (emms-add-url (nth 0 enclosure)))))
+
+
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
