@@ -9,3 +9,10 @@
 /emacs.d/bookmarks
 /emacs.d/auto-save*
 /emacs.d/#.*
+/emacs.d/dump.el
+/emacs.d/games/
+/emacs.d/projectile-bookmarks.eld
+/emacs.d/speed-type/
+/emacs.d/var/
+/emacs.d/xwwp/
+/AppleScripts/

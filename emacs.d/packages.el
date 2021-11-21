@@ -57,10 +57,7 @@
   (which-key-mode))
 
 
-(use-package projectile
-  :init (projectile-mode)
-  :bind (:map projectile-mode-map
-              ("s-p" . 'projectile-command-map)))
+
 (use-package company
   :defer t
   :bind (:map company-active-map
@@ -71,7 +68,11 @@
   (global-company-mode)
 )
 (use-package go-mode :defer t)
+(use-package lua-mode :defer t)
+(use-package clojure-mode :defer t)
+(use-package cider :defer t)
 (use-package swift-mode :defer t)
+(use-package json-mode :defer t)
 (use-package lsp-sourcekit
   :after lsp-mode
   :config
@@ -95,7 +96,7 @@
     ("e" (cle/open-elfeed-filtered "@6-month-ago +emacs +unread") "emacs")
     ("m"(cle/open-elfeed-filtered "@6-month-ago +mac +unread") "mac")
     ("x"(cle/open-elfeed-filtered "@6-month-ago +xbox +unread") "xbox")
-    ("p"(cle/open-elfeed-filtered "@2-week-ago +podcast") "podcast")
+    ("p"(cle/open-elfeed-filtered "@2-ek-ago +podcast") "podcast")
     ("a"(cle/open-elfeed-filtered "@6-month-ago +unread") "todos não lidos")
   )
   (setq browse-url-browser-function 'eww-browse-url)
@@ -111,7 +112,8 @@
           ("https://emacsredux.com/atom.xml" emacs)
           ("http://ergoemacs.org/emacs/blog.xml" mac)
           ("https://irreal.org/blog/?feed=atom" mac)
-          ("http://td1p.com/feed/podcast/" podcast podtrash))))
+          ("http://td1p.com/feed/podcast/" podcast podtrash)
+          ("https://jovemnerd.com.br/feed-nerdcast/" podcast nerdcast2))))
 
 
 
@@ -198,3 +200,5 @@
   (require 'helm-config)
   (helm-mode 1)
 )
+(use-package rainbow-delimiters :defer t)
+(use-package web-mode :defer t)
