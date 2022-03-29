@@ -40,7 +40,6 @@
 
   :hook (;; replace XXX-mode with concrete major-mode(e. g. python-mode)
          (go-mode . lsp)
-         (rust-mode . lsp)
          (swift-mode . lsp)
          ;; if you want which-key integration
          (lsp-mode . lsp-enable-which-key-integration))
@@ -78,7 +77,20 @@
   :config
   (setq lsp-sourcekit-executable "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/sourcekit-lsp"))
 
-(use-package rust-mode :defer t)
+;;(use-package rust-mode :defer t)
+(use-package rustic
+  :defer t
+  :config
+  (setq lsp-rust-analyzer-server-display-inlay-hints t)
+  :bind (:map rustic-mode-map
+              ("M-j" . lsp-ui-imenu)
+              ("M-?" . lsp-find-references)
+              ("C-c C-c l" . flycheck-list-errors)
+              ("C-c C-c a" . lsp-execute-code-action)
+              ("C-c C-c r" . lsp-rename)
+              ("C-c C-c q" . lsp-workspace-restart)
+              ("C-c C-c Q" . lsp-workspace-shutdown)
+              ("C-c C-c s" . lsp-rust-analyzer-status)))
 (use-package yaml-mode :defer t)
 
 
@@ -155,7 +167,7 @@
    (emms-all)
    (emms-default-players)
    (setq emms-player-list '(emms-player-mpv))
-   (setq emms-player-mpv-parameters '("--quiet" "--really-quiet" "--no-audio-display" "--cache-secs=240"))
+   (setq emms-player-mpv-parameters '("--quiet" "--really-quiet" "--no-audio-display" "--cache-secs=240" "--referrer='Referer: https://trovo.live'"))
    (defhydra cle/hydra-emms()
      ("t" emms-pause "Toggle")
      ("s" emms-stop "Stop")
@@ -184,21 +196,21 @@
     ("b" dumb-jump-back "Back"))
 
 
-(use-package helm
+
+(use-package ivy
+  :ensure t
+  :demand)
+
+(use-package counsel
   :ensure t
   :demand
-  :bind (("M-x" . helm-M-x)
-         ("C-x C-f" . helm-find-files)
-         ("C-x b" . helm-buffers-list)
-         ("C-x c o" . helm-occur)
-         ("M-y" . helm-show-kill-ring)
-         ("C-x r b" . helm-filtered-bookmarks)
-         ("C-x C-r" . helm-recentf)
-         ("C-x C-d" . helm-browse-project)
-         )
-  :config
-  (require 'helm-config)
-  (helm-mode 1)
-)
+  :config (counsel-mode))
+
+
 (use-package rainbow-delimiters :defer t)
 (use-package web-mode :defer t)
+(use-package flycheck
+  :ensure
+  :defer t)
+
+(use-package fzf :defer t)
