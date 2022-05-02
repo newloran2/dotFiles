@@ -214,3 +214,8 @@
   :defer t)
 
 (use-package fzf :defer t)
+(use-package restclient :defer t)
+(use-package lsp-dart 
+  :ensure t 
+  :hook (dart-mode . lsp))
+(use-package hover :ensure t)
