@@ -219,3 +219,4 @@
   :ensure t 
   :hook (dart-mode . lsp))
 (use-package hover :ensure t)
+(use-package vterm :ensure t)
