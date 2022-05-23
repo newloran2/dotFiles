@@ -220,3 +220,9 @@
   :hook (dart-mode . lsp))
 (use-package hover :ensure t)
 (use-package vterm :ensure t)
+
+
+(use-package evil
+  :ensure t
+  :config
+  (evil-mode))
