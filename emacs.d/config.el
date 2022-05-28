@@ -1,4 +1,5 @@
- (setq inhibit-startup-message t)
+
+(setq inhibit-startup-message t)
 
 (when (fboundp 'tool-bar-mode) (tool-bar-mode -1))
 (when (fboundp 'menu-bar-mode) (menu-bar-mode -1))
@@ -12,7 +13,7 @@
 (recentf-mode t)
 (setq recentf-max-saved-items 100)
 (setq recentf-exclude '("~/.emacs.d/elpa"))
-;;(global-set-key "\C-x\ \C-r" 'ido-recentf-open)
+(global-set-key (kbd "C-c r") 'ido-recentf-open)
 (global-set-key (kbd "C-c s") (lambda() (interactive) (switch-to-buffer "*scratch*")))
 (global-set-key (kbd "C-c a") 'org-agenda)
 ;;evil
