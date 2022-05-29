@@ -1,13 +1,4 @@
-
---setup telescope
-require('telescope').setup({
-	defaults = {
-		layout_config = {
-			vertical = { width = 0.5 }
-		},
-	},
-})
-
+require('plugins/telescope')
 --lualine
 require('lualine').setup()
 
@@ -15,7 +6,7 @@ require('lsp')
 
 require'nvim-treesitter.configs'.setup {
   -- A list of parser names, or "all"
-  ensure_installed = {  "go", "lua", "rust" },
+  ensure_installed = {  "go", "lua", "rust", "kotlin", "dart", "swift" },
 
 
   -- Install parsers synchronously (only applied to `ensure_installed`)

@@ -6,7 +6,9 @@ return require('packer').startup(function()
 	use { 'tpope/vim-fugitive' }                       -- git integration
 	use { 'junegunn/gv.vim' }                          -- commit history
 
-	use {'voldikss/vim-floaterm'}
+	use {"akinsho/toggleterm.nvim", tag = 'v1.*', config = function()
+		require("toggleterm").setup()
+	end}
 	use { 
 		'phaazon/hop.nvim',
 		config = function() 
@@ -22,13 +24,21 @@ return require('packer').startup(function()
 	use 'L3MON4D3/LuaSnip'
 	use 'saadparwaiz1/cmp_luasnip'
 	use 'hrsh7th/cmp-nvim-lua'
+	-- use {'akinsho/flutter-tools.nvim', requires = 'nvim-lua/plenary.nvim'}
 	use {
 		'nvim-lualine/lualine.nvim',
 		requires = { 'kyazdani42/nvim-web-devicons', opt = true }
 	}
+
 	use {
 		'nvim-telescope/telescope.nvim',
 		requires = { {'nvim-lua/plenary.nvim'} }
+	}
+	use {
+		'numToStr/Comment.nvim',
+		config = function()
+			require('Comment').setup()
+		end
 	}
 	use { 'nvim-treesitter/nvim-treesitter'}
 	-- You can alias plugin names

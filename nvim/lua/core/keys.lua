@@ -1,11 +1,11 @@
-local map = vim.api.nvim_set_keymap
+map = vim.api.nvim_set_keymap
 vim.g.mapleader = " " 
 
-map('n', '<leader>ff', [[:Telescope find_files<CR>]], {})
-map('n', '<leader>fh', [[:Telescope oldfiles<CR>]], {})
-map('n', '<leader>bb', [[:Telescope buffers<CR>]], {})
-map('n', '<leader>bd', [[:bdelete<CR>]], {})
-map('n', '<leader>tt', [[:FloatermToggletCR>]], {})
-map('i', 'jk', '<Esc>', {})
+function lmap(key, command, mode, other) 
+	map(mode or 'n', '<leader>'..key, ":"..command.."<cr>", other or {})
+end
 
-map('n', '<leader>fw', [[:HopChar2<cr>]],{})
+lmap('bd', 'bdelete')
+lmap('tt', 'ToggleTerm')
+map('i', 'jk', '<Esc>', {})
+lmap('fw', 'HopChar2')

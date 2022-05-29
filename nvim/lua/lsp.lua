@@ -9,23 +9,24 @@ require("nvim-lsp-installer").setup({
 		}
 	}
 })
+
+local function keyBindConfig()
+	vim.keymap.set("n","K", vim.lsp.buf.hover, {buffer = 0})
+	vim.keymap.set("n","gd", vim.lsp.buf.definition, {buffer = 0})
+	vim.keymap.set("n","gt", vim.lsp.buf.type_definition, {buffer = 0})
+	vim.keymap.set("n","<leader>r", vim.lsp.buf.rename, {buffer = 0})
+	vim.keymap.set("n","<leader>dj", vim.diagnostic.goto_next, {buffer = 0})
+	vim.keymap.set("n","<leader>dk", vim.diagnostic.goto_prev, {buffer = 0})
+end
 local capabilities = require('cmp_nvim_lsp').update_capabilities(vim.lsp.protocol.make_client_capabilities())
-local servers = { 'gopls', 'sumneko_lua', 'jsonls','kotlin_language_server','rust_analyzer', 'sourcekit'}
+local servers = { 'gopls', 'jsonls','kotlin_language_server','rust_analyzer', 'sourcekit'}
 for _, i in pairs(servers) do
-	-- go configuration
+	--gebnerar server configurations
 	lsp[i].setup{
 		capabilities = capabilities,
-		on_attach = function()
-			vim.keymap.set("n","K", vim.lsp.buf.hover, {buffer = 0})
-			vim.keymap.set("n","gd", vim.lsp.buf.definition, {buffer = 0})
-			vim.keymap.set("n","gt", vim.lsp.buf.type_definition, {buffer = 0})
-			vim.keymap.set("n","<leader>r", vim.lsp.buf.rename, {buffer = 0})
-			vim.keymap.set("n","<leader>dj", vim.diagnostic.goto_next, {buffer = 0})
-			vim.keymap.set("n","<leader>dk", vim.diagnostic.goto_prev, {buffer = 0})
-		end,
+		on_attach = keyBindConfig,
 	}
 end
-
 vim.opt.completeopt={"menu", "menuone", "noselect"} 
 
 -- Setup nvim-cmp.
