@@ -15,15 +15,20 @@ return require('packer').startup(function()
 			require 'hop'.setup() 
 		end
 	}										-- easy moviments
+
+	-- lsp 
 	use 'neovim/nvim-lspconfig'
 	use 'williamboman/nvim-lsp-installer'
 	use 'hrsh7th/nvim-cmp'
 	use 'hrsh7th/cmp-nvim-lsp'
 	use 'hrsh7th/cmp-buffer'
 	use 'hrsh7th/cmp-path'
-	use 'L3MON4D3/LuaSnip'
-	use 'saadparwaiz1/cmp_luasnip'
 	use 'hrsh7th/cmp-nvim-lua'
+
+	-- luasnip	
+	use 'saadparwaiz1/cmp_luasnip'
+	use 'L3MON4D3/LuaSnip'
+
 	-- use {'akinsho/flutter-tools.nvim', requires = 'nvim-lua/plenary.nvim'}
 	use {
 		'nvim-lualine/lualine.nvim',
