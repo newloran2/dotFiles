@@ -6,6 +6,8 @@ function lmap(key, command, mode, other)
 end
 
 lmap('bd', 'bdelete')
-lmap('tt', 'ToggleTerm')
-map('i', 'jk', '<Esc>', {})
 lmap('fw', 'HopChar2')
+
+map('i', 'jk', '<Esc>', {})
+map('i', '<C-s>', '<Esc> :w<cr>i', {}) 
+map('n', '<C-s>', '<Esc> :w<cr>', {}) 

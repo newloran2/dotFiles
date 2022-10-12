@@ -1,16 +1,18 @@
 vim.cmd [[packadd packer.nvim]]
 
 return require('packer').startup(function()
-	-- Packer can manage itself
 	use 'wbthomason/packer.nvim'
-	use { 'tpope/vim-fugitive' }                       -- git integration
-	use { 'junegunn/gv.vim' }                          -- commit history
 
-	use {"akinsho/toggleterm.nvim", tag = 'v1.*', config = function()
-		require("toggleterm").setup()
-	end}
+	use {
+		"akinsho/toggleterm.nvim", 
+		tag = '*', 
+		config = function()
+			require("plugins.toggleterm")
+		end
+	}
 	use { 
 		'phaazon/hop.nvim',
+		cmd = "HopChar2",
 		config = function() 
 			require 'hop'.setup() 
 		end
@@ -35,9 +37,9 @@ return require('packer').startup(function()
 		requires = { 'kyazdani42/nvim-web-devicons', opt = true }
 	}
 
-	use {
-		'nvim-telescope/telescope.nvim',
-		requires = { {'nvim-lua/plenary.nvim'} }
+	use { 'ibhagwan/fzf-lua',
+		requires = { 'kyazdani42/nvim-web-devicons' },
+		config = require("plugins.fzf-lua")
 	}
 	use {
 		'numToStr/Comment.nvim',
@@ -45,8 +47,17 @@ return require('packer').startup(function()
 			require('Comment').setup()
 		end
 	}
-	use { 'nvim-treesitter/nvim-treesitter'}
-	-- You can alias plugin names
+	use {
+		'nvim-treesitter/nvim-treesitter',
+		config = function() 
+			require'nvim-treesitter.configs'.setup {
+				ensure_installed = {  "go", "lua", "rust", "kotlin", "swift" },
+				sync_install = false,
+				ignore_install = { "javascript" },
+				highlight = {enable = true}
+			}
+		end
+	}
 	use {'dracula/vim', as = 'dracula'}
 end)
 

@@ -9,7 +9,7 @@ opt.cursorline = true
 opt.cursorcolumn = true
 opt.background=dark
 opt.lazyredraw = true
-
+opt.guifont="Fira Code:h12"
 opt.syntax = "ON" 		-- ativar a colocaração de syntaxe
 opt.termguicolors = true 	-- fica mais bonito o tema pois ativa o tema gui
 cmd('colorscheme dracula')	-- colorscheme
