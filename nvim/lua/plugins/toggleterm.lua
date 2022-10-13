@@ -1,4 +1,9 @@
-require("toggleterm").setup()
+require("toggleterm").setup{
+	open_mapping = [[<c-t>]],
+	direction = "horizontal",
+	insert_mappings = true
+
+}
 
 local Terminal = require("toggleterm.terminal").Terminal 
 local lazygit = Terminal:new({
@@ -17,8 +22,8 @@ end
 
 
 lmap('tg', 'lua _lazygit_toggle()')
-lmap('tt', 'ToggleTerm direction="float"')
-lmap('tt', 'ToggleTerm direction="float"', 't')
+-- lmap('tt', 'ToggleTerm direction="float"')
+-- lmap('tt', 'ToggleTerm direction="float"', 't')
 
 
 local opts = {buffer = 0}

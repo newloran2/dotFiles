@@ -16,3 +16,5 @@
 /emacs.d/var/
 /emacs.d/xwwp/
 /AppleScripts/
+
+nvim/plugin/packer_compiled.lua

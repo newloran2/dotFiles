@@ -31,6 +31,14 @@ return require('packer').startup(function()
 	use 'saadparwaiz1/cmp_luasnip'
 	use 'L3MON4D3/LuaSnip'
 
+
+	use {
+		'chentoast/marks.nvim',
+		config = function() 
+			require('marks').setup() 
+		end
+	}
+
 	-- use {'akinsho/flutter-tools.nvim', requires = 'nvim-lua/plenary.nvim'}
 	use {
 		'nvim-lualine/lualine.nvim',
@@ -39,7 +47,9 @@ return require('packer').startup(function()
 
 	use { 'ibhagwan/fzf-lua',
 		requires = { 'kyazdani42/nvim-web-devicons' },
-		config = require("plugins.fzf-lua")
+		config = function() 
+			require("plugins.fzf-lua")
+		end
 	}
 	use {
 		'numToStr/Comment.nvim',
@@ -59,6 +69,41 @@ return require('packer').startup(function()
 		end
 	}
 	use {'dracula/vim', as = 'dracula'}
-end)
+	use {
+	 'simrat39/symbols-outline.nvim',
+      config = function()
+			require("plugins.symbols-outline")
+      end
+	}
+	use {
+		'chipsenkbeil/distant.nvim',
+		branch = 'PrepareForDistant16',
+		config = function()
+			require('distant').setup {
+				-- Applies Chip's personal settings to every machine you connect to
+				--
+				-- 1. Ensures that distant servers terminate with no connections
+				-- 2. Provides navigation bindings for remote directories
+				-- 3. Provides keybinding to jump into a remote file's parent directory
+				['*'] = require('distant.settings').chip_default()
+			}
+		end
+	}
+	-- use {
+		-- 	 "nvim-neorg/neorg",
+		-- 	 -- tag = "*",
+		-- 	 -- ft = "norg",
+		-- 	 -- after = "nvim-treesitter", -- You may want to specify Telescope here as well
+		-- 	 requires = "nvim-lua/plenary.nvim",
+		-- 	 run = ":Neorg sync-parsers",
+		-- 	 config = function()
+			-- 		  require('neorg').setup {
+				-- 			  load = {
+					-- 				  ["core.defaults"] = {}
+					-- 			 }
+					-- 		  }
+					-- 	 end
+					-- }	
+				end)
 
 
