@@ -2,6 +2,10 @@ local opt = vim.opt
 cmd = vim.api.nvim_command
 
 vim.wo.wrap = false
+-- Treesitter folding 
+vim.wo.foldmethod = 'expr'
+vim.wo.foldexpr = 'nvim_treesitter#foldexpr()'
+
 opt.tabstop = 3
 opt.shiftwidth = 3
 opt.relativenumber = true

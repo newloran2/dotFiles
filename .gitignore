@@ -18,3 +18,5 @@
 /AppleScripts/
 
 nvim/plugin/packer_compiled.lua
+.DS_Store
+nvim/.DS_Store

@@ -5,6 +5,8 @@ return require('packer').startup(function()
 
 	use {
 		"akinsho/toggleterm.nvim", 
+		key = "<c-t>", 
+		cmd = "Toggleterm",
 		tag = '*', 
 		config = function()
 			require("plugins.toggleterm")
@@ -39,14 +41,20 @@ return require('packer').startup(function()
 		end
 	}
 
+	use {
+		"windwp/nvim-autopairs",
+		 config = function() require("nvim-autopairs").setup {} end
+	}
+
 	-- use {'akinsho/flutter-tools.nvim', requires = 'nvim-lua/plenary.nvim'}
 	use {
 		'nvim-lualine/lualine.nvim',
-		requires = { 'kyazdani42/nvim-web-devicons', opt = true }
+		requires = { 'nvim-tree/nvim-web-devicons'}
 	}
 
 	use { 'ibhagwan/fzf-lua',
-		requires = { 'kyazdani42/nvim-web-devicons' },
+		requires = { 'nvim-tree/nvim-web-devicons' },
+		cmd ='FzfLua',
 		config = function() 
 			require("plugins.fzf-lua")
 		end
@@ -64,46 +72,193 @@ return require('packer').startup(function()
 				ensure_installed = {  "go", "lua", "rust", "kotlin", "swift" },
 				sync_install = false,
 				ignore_install = { "javascript" },
-				highlight = {enable = true}
+				highlight = {enable = true},
+				indent = { enable = true },
+				rainbow = {
+					enable = true, 
+					extended_mode = true, 
+					max_file_lines = nil,
+				}
 			}
-		end
-	}
+	 	end,
+		incremental_selection = {
+			enable = enable,
+			keymaps = {
+			  -- mappings for incremental selection (visual mappings)
+			  init_selection = "gnn", -- maps in normal mode to init the node/scope selection
+			  node_incremental = "grn", -- increment to the upper named parent
+			  scope_incremental = "grc", -- increment to the upper scope (as defined in locals.scm)
+			  node_decremental = "grm" -- decrement to the previous node
+			}
+		 },
+
+    textobjects = {
+      -- syntax-aware textobjects
+      enable = enable,
+      lsp_interop = {
+        enable = enable,
+        peek_definition_code = {
+          ["DF"] = "@function.outer",
+          ["DF"] = "@class.outer"
+        }
+      },
+      keymaps = {
+        ["iL"] = {
+          -- you can define your own textobjects directly here
+          go = "(function_definition) @function",
+        },
+        -- or you use the queries from supported languages with textobjects.scm
+        ["af"] = "@function.outer",
+        ["if"] = "@function.inner",
+        ["aC"] = "@class.outer",
+        ["iC"] = "@class.inner",
+        ["ac"] = "@conditional.outer",
+        ["ic"] = "@conditional.inner",
+        ["ae"] = "@block.outer",
+        ["ie"] = "@block.inner",
+        ["al"] = "@loop.outer",
+        ["il"] = "@loop.inner",
+        ["is"] = "@statement.inner",
+        ["as"] = "@statement.outer",
+        ["ad"] = "@comment.outer",
+        ["am"] = "@call.outer",
+        ["im"] = "@call.inner"
+      },
+      move = {
+        enable = enable,
+        set_jumps = true, -- whether to set jumps in the jumplist
+        goto_next_start = {
+          ["]m"] = "@function.outer",
+          ["]]"] = "@class.outer"
+        },
+        goto_next_end = {
+          ["]M"] = "@function.outer",
+          ["]["] = "@class.outer"
+        },
+        goto_previous_start = {
+          ["[m"] = "@function.outer",
+          ["[["] = "@class.outer"
+        },
+        goto_previous_end = {
+          ["[M"] = "@function.outer",
+          ["[]"] = "@class.outer"
+        }
+      },
+      select = {
+        enable = enable,
+        keymaps = {
+          -- You can use the capture groups defined in textobjects.scm
+          ["af"] = "@function.outer",
+          ["if"] = "@function.inner",
+          ["ac"] = "@class.outer",
+          ["ic"] = "@class.inner",
+          -- Or you can define your own textobjects like this
+          ["iF"] = {
+            python = "(function_definition) @function",
+            cpp = "(function_definition) @function",
+            c = "(function_definition) @function",
+            java = "(method_declaration) @function",
+            go = "(method_declaration) @function"
+          }
+        }
+      },
+      swap = {
+        enable = enable,
+        swap_next = {
+          ["<leader>a"] = "@parameter.inner"
+        },
+        swap_previous = {
+          ["<leader>A"] = "@parameter.inner"
+        }
+      }
+    }
+  }
 	use {'dracula/vim', as = 'dracula'}
 	use {
 	 'simrat39/symbols-outline.nvim',
+		keys = "<leader>so",
       config = function()
 			require("plugins.symbols-outline")
       end
 	}
 	use {
-		'chipsenkbeil/distant.nvim',
-		branch = 'PrepareForDistant16',
-		config = function()
-			require('distant').setup {
-				-- Applies Chip's personal settings to every machine you connect to
-				--
-				-- 1. Ensures that distant servers terminate with no connections
-				-- 2. Provides navigation bindings for remote directories
-				-- 3. Provides keybinding to jump into a remote file's parent directory
-				['*'] = require('distant.settings').chip_default()
-			}
+		'ray-x/go.nvim',
+		ft='go',
+		config = function() 
+			-- require('go').setup()
+			local capabilities = require('cmp_nvim_lsp').default_capabilities(vim.lsp.protocol.make_client_capabilities())
+			require('go').setup({
+			  -- other setups ....
+			  lsp_cfg = {
+				 capabilities = capabilities,
+				 -- other setups
+			  },
+			})
+		end
+	}
+	use 'ray-x/guihua.lua'
+	use {
+		'leoluz/nvim-dap-go', 
+		requires = 'mfussenegger/nvim-dap', 
+		config = function() 
+			require('plugins.dap')
+		end
+	}
+	use 'Pocco81/DAPInstall.nvim'
+	use { 
+		'rcarriga/nvim-dap-ui',
+      config = function()
+         require('dapui').setup()
+      end
+   }
+
+	use { 
+		'simrat39/rust-tools.nvim',
+		ft = {'rs', 'toml'},
+		requires = {'nvim-lua/plenary.nvim', 'saecki/crates.nvim'},
+		config = function () 
+			require("plugins.rust-tools")
 		end
 	}
 	-- use {
-		-- 	 "nvim-neorg/neorg",
-		-- 	 -- tag = "*",
-		-- 	 -- ft = "norg",
-		-- 	 -- after = "nvim-treesitter", -- You may want to specify Telescope here as well
-		-- 	 requires = "nvim-lua/plenary.nvim",
-		-- 	 run = ":Neorg sync-parsers",
-		-- 	 config = function()
-			-- 		  require('neorg').setup {
-				-- 			  load = {
-					-- 				  ["core.defaults"] = {}
-					-- 			 }
-					-- 		  }
-					-- 	 end
-					-- }	
-				end)
+	-- 	'chipsenkbeil/distant.nvim',
+	-- 	branch = 'PrepareForDistant16',
+	-- 	config = function()
+	-- 		require('distant').setup {
+	-- 			-- Applies Chip's personal settings to every machine you connect to
+	-- 			--
+	-- 			-- 1. Ensures that distant servers terminate with no connections
+	-- 			-- 2. Provides navigation bindings for remote directories
+	-- 			-- 3. Provides keybinding to jump into a remote file's parent directory
+	-- 			['*'] = require('distant.settings').chip_default(),
+	-- 			['208.87.128.82'] = {
+	-- 				lsp = {
+	-- 					['crunchyroll-go'] = {
+	-- 						cmd = '/home/erik/go/bin/gopls',
+	-- 						root_dir = '/home/erik/projetos/crunchyroll-go',
+	-- 						filetypes = {'go'},
+	-- 						opts = { log_file = '/tmp/remote.dev.log', verbose=3},
+	-- 						on_attach = function()
+	-- 							nnoremap('gD', '<CMD>lua vim.lsp.buf.declaration()<CR>')
+	-- 							nnoremap('gd', '<CMD>lua vim.lsp.buf.definition()<CR>')
+	-- 							nnoremap('gh', '<CMD>lua vim.lsp.buf.hover()<CR>')
+	-- 							nnoremap('gi', '<CMD>lua vim.lsp.buf.implementation()<CR>')
+	-- 							nnoremap('gr', '<CMD>lua vim.lsp.buf.references()<CR>')
+	-- 						 end
+	-- 					}
+	-- 				}
+	-- 			}
+	-- 		}
+	-- 	end
+	-- }
 
+use {
+    'goolord/alpha-nvim',
+    requires = { 'nvim-tree/nvim-web-devicons' },
+    config = function ()
+        require'alpha'.setup(require'alpha.themes.dashboard'.config)
+    end
+}
+
+end)
 

@@ -10,21 +10,22 @@ require("nvim-lsp-installer").setup({
 	}
 })
 
-local function keyBindConfig()
+function lsp_keybind_config()
 	vim.keymap.set("n","K", vim.lsp.buf.hover, {buffer = 0})
 	vim.keymap.set("n","gd", vim.lsp.buf.definition, {buffer = 0})
 	vim.keymap.set("n","gt", vim.lsp.buf.type_definition, {buffer = 0})
 	vim.keymap.set("n","<leader>r", vim.lsp.buf.rename, {buffer = 0})
 	vim.keymap.set("n","<leader>dj", vim.diagnostic.goto_next, {buffer = 0})
 	vim.keymap.set("n","<leader>dk", vim.diagnostic.goto_prev, {buffer = 0})
+	vim.keymap.set("n","<leader>w", peek_definition,{buffer = 0})
 end
-local capabilities = require('cmp_nvim_lsp').update_capabilities(vim.lsp.protocol.make_client_capabilities())
+local capabilities = require('cmp_nvim_lsp').default_capabilities(vim.lsp.protocol.make_client_capabilities())
 local servers = { 'gopls', 'jsonls','kotlin_language_server','rust_analyzer', 'sourcekit'}
 for _, i in pairs(servers) do
 	--gebnerar server configurations
 	lsp[i].setup{
 		capabilities = capabilities,
-		on_attach = keyBindConfig,
+		on_attach = lsp_keybind_config,
 	}
 end
 vim.opt.completeopt={"menu", "menuone", "noselect"} 
@@ -40,8 +41,8 @@ cmp.setup({
 		end,
 	},
 	window = {
-		-- completion = cmp.config.window.bordered(),
-		-- documentation = cmp.config.window.bordered(),
+		completion = cmp.config.window.bordered(),
+		documentation = cmp.config.window.bordered(),
 	},
 	mapping = cmp.mapping.preset.insert({
 		['<C-b>'] = cmp.mapping.scroll_docs(-4),
@@ -86,3 +87,23 @@ cmp.setup.cmdline(':', {
 	})
 })
 
+
+
+
+
+local function preview_location_callback(_, method, result)
+  if result == nil or vim.tbl_isempty(result) then
+    vim.lsp.log.info(method, 'No location found')
+    return nil
+  end
+  if vim.tbl_islist(result) then
+    vim.lsp.util.preview_location(result[1])
+  else
+    vim.lsp.util.preview_location(result)
+  end
+end
+
+function peek_definition()
+  local params = vim.lsp.util.make_position_params()
+  return vim.lsp.buf_request(0, 'textDocument/definition', params, preview_location_callback)
+end
