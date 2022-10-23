@@ -5,8 +5,6 @@ return require('packer').startup(function()
 
 	use {
 		"akinsho/toggleterm.nvim", 
-		key = "<c-t>", 
-		cmd = "Toggleterm",
 		tag = '*', 
 		config = function()
 			require("plugins.toggleterm")
@@ -52,9 +50,13 @@ return require('packer').startup(function()
 		requires = { 'nvim-tree/nvim-web-devicons'}
 	}
 
+
+   use {
+     'nvim-telescope/telescope.nvim',
+     requires = { {'nvim-lua/plenary.nvim'} }
+   }
 	use { 'ibhagwan/fzf-lua',
 		requires = { 'nvim-tree/nvim-web-devicons' },
-		cmd ='FzfLua',
 		config = function() 
 			require("plugins.fzf-lua")
 		end
@@ -211,13 +213,14 @@ return require('packer').startup(function()
          require('dapui').setup()
       end
    }
-
+   use {'stevearc/dressing.nvim'}
 	use { 
 		'simrat39/rust-tools.nvim',
-		ft = {'rs', 'toml'},
+		-- ft = {'rs', 'toml'},
 		requires = {'nvim-lua/plenary.nvim', 'saecki/crates.nvim'},
 		config = function () 
 			require("plugins.rust-tools")
+         print("carregou o rust-tools")
 		end
 	}
 	-- use {
@@ -259,6 +262,6 @@ use {
         require'alpha'.setup(require'alpha.themes.dashboard'.config)
     end
 }
-
+use 'ray-x/aurora'
 end)
 

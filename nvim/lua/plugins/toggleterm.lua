@@ -1,6 +1,6 @@
 require("toggleterm").setup{
 	open_mapping = [[<c-t>]],
-	direction = "horizontal",
+	direction = "float",
 	insert_mappings = true
 
 }
@@ -19,9 +19,22 @@ local lazygit = Terminal:new({
 function _lazygit_toggle()
 	lazygit:toggle()
 end
+local btop = Terminal:new({
+	cmd = "btop",
+	direction = "float",
+	float_opts = {
+		border = "double",
+	},
+	close_on_exit = true
+})
+
+function _btop_toggle()
+	btop:toggle()
+end
 
 
 lmap('tg', 'lua _lazygit_toggle()')
+lmap('tb', 'lua _btop_toggle()')
 -- lmap('tt', 'ToggleTerm direction="float"')
 -- lmap('tt', 'ToggleTerm direction="float"', 't')
 
