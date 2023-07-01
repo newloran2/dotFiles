@@ -1,3 +1,4 @@
+print("Configruando o rust")
 local rt = require("rust-tools")
 require('crates').setup()
 
@@ -11,6 +12,7 @@ capabilities.textDocument.completion.completionItem.resolveSupport = {
    }
 }
 -- capabilities = vim.tbl_extend('keep', capabilities or {}, lsp_status.capabilities)
+
 
 capabilities.experimental = {}
 capabilities.experimental.hoverActions = true
@@ -55,8 +57,8 @@ rt.setup({
       },
    },
    server = {
-      on_attach = function(_, bufnr) 
-         lsp_keybind_config()
+      on_attach = function(client, bufnr) 
+         default_lsp_key_bind(client, bufnr)
          vim.keymap.set("n", "<leader>K", ":FzfLua lsp_code_actions<cr>", { buffer = bufnr })
          vim.keymap.set("n", "<leader>cr", '<cmd>lua require("rust-tools").runnables.runnables()<cr>', {buffer = bufnr})
       end

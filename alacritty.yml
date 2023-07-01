@@ -1,4 +1,4 @@
-colors:
+olors:
   primary:
     background: '#000000'
     foreground: '#abb2bf'
@@ -11,7 +11,7 @@ colors:
   normal:
     black:      '#5c6370' # mono-3
     red:        '#e06c75' # red 1
-    green:      '#98c379'
+    green:      '#98c379' 
     yellow:     '#e5c07b' # orange 2
     blue:       '#61afef'
     magenta:    '#c678dd'
@@ -20,6 +20,13 @@ colors:
 
 env:
   TERM: xterm-256color
+
+window:
+  option_as_alt: Both
+  decorations: buttonless
+  padding:
+    x: 2 
+    y: 2
 
 shell:
   program: /opt/homebrew/bin/tmux
@@ -58,6 +65,7 @@ key_bindings:
   - { key: D,        mods: Command, chars: "\x02\x25"} #ctrl-b-% 
   - { key: W,        mods: Command, chars: "\x02\x78"} #ctrl-b-x
   - { key: T,        mods: Command, chars: "\x02\x63"} #ctrl-b-c
+  - { key: O,        mods: Command, chars: "\x02\x6f"} #ctrl-b-o
   - { key: Key0,     mods: Command, chars: "\x02\x30"} #ctrl-b-1
   - { key: Key1,     mods: Command, chars: "\x02\x31"} #ctrl-b-1
   - { key: Key2,     mods: Command, chars: "\x02\x32"} #ctrl-b-2
@@ -74,3 +82,7 @@ key_bindings:
   - { key: S,        mods: Command|Shift, chars: "\x02\x73"} #ctrl-b-s
   - { key: LBracket,        mods: Command, chars: "\x02\x28"} #ctrl-b-(
   - { key: RBracket,        mods: Command, chars: "\x02\x29"} #ctrl-b-)
+  # default terminals mappings
+  - { key: F,  mods: Alt,           chars: "\x1bf"}
+  - { key: B,  mods: Alt,           chars: "\x1bb"}
+  - { key: D,  mods: Alt,           chars: "\x1bd"                       }

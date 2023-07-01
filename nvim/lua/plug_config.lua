@@ -1,5 +1,5 @@
 --lualine
-require('lualine').setup()
+require('plugins/lualine')
 
 require('lsp')
-
+require('plugins/cmp')
