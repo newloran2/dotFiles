@@ -21,3 +21,4 @@ nvim/plugin/packer_compiled.lua
 .DS_Store
 nvim/.DS_Store
 hammerspoon/Spoons/AppLauncher.spoon
+emacs.d/undo

@@ -30,8 +30,15 @@
 (use-package monokai-pro-theme
   :config (load-theme 'monokai-pro t))
 
+
+;; (use-package eglot
+;;   :ensure t
+;;   :hook
+;;   (go-mode . eglot-ensure)
+;;   (rustic-mode . eglot-ensure)
+;;   )
 ;; configurando o ls
-(use-package lsp-mode
+(use-package lsp-mode                   
   :init
   ;; set prefix for lsp-command-keymap (few alternatives - "C-l", "C-c l")
   (setq lsp-keymap-prefix "C-c l")
@@ -68,14 +75,12 @@
 )
 (use-package go-mode :defer t)
 (use-package lua-mode :defer t)
-(use-package clojure-mode :defer t)
-(use-package cider :defer t)
 (use-package swift-mode :defer t)
 (use-package json-mode :defer t)
-(use-package lsp-sourcekit
-  :after lsp-mode
-  :config
-  (setq lsp-sourcekit-executable "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/sourcekit-lsp"))
+;; (use-package lsp-sourcekit
+;;   :after lsp-mode
+;;   :config
+;;   (setq lsp-sourcekit-executable "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/sourcekit-lsp"))
 
 ;;(use-package rust-mode :defer t)
 (use-package rustic
@@ -154,28 +159,14 @@
 (use-package try :commands try)
 
 
-(use-package undo-tree :init (global-undo-tree-mode))
+(use-package undo-tree
+  :init (global-undo-tree-mode)
+  :config
+  (setq undo-tree-history-directory-alist '(("." . "~/.emacs.d/undo")))
+  )
 (use-package eshell-toggle
   :bind
   ("C-c t t" . eshell-toggle))
-
- (use-package emms
-   :bind (
-          ("C-c e" . cle/hydra-emms/body)
-          )
-   :config
-   (emms-all)
-   (emms-default-players)
-   (setq emms-player-list '(emms-player-mpv))
-   (setq emms-player-mpv-parameters '("--quiet" "--really-quiet" "--no-audio-display" "--cache-secs=240" "--referrer='Referer: https://trovo.live'"))
-   (defhydra cle/hydra-emms()
-     ("t" emms-pause "Toggle")
-     ("s" emms-stop "Stop")
-     ("a" emms-add-url "add-url")
-     ("j" emms-seek-to "seek")
-     ("o" emms "open emms")
-   ))
-
 
 (use-package dumb-jump
   :bind (
@@ -213,16 +204,11 @@
   :ensure
   :defer t)
 
-(use-package fzf :defer t)
 (use-package restclient :defer t)
-(use-package lsp-dart 
-  :ensure t 
-  :hook (dart-mode . lsp))
-(use-package hover :ensure t)
-(use-package vterm :ensure t)
-
 
 (use-package evil
   :ensure t
   :config
   (evil-mode))
+
+
