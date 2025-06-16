@@ -73,7 +73,16 @@ See `elfeed-play-with-mpv'."
                 (nth 1 enclosure)))
       (emms-add-url (nth 0 enclosure)))))
 
-
+(defun kill-other-buffers-except-scratch ()
+  "Kill all buffers except the current one and the *scratch* buffer."
+  (interactive)
+  (let ((current-buffer-name (buffer-name))
+        (scratch-buffer-name "*scratch*"))
+    (dolist (buffer (buffer-list))
+      (with-current-buffer buffer
+        (unless (or (eq (buffer-name) current-buffer-name)
+                    (equal (buffer-name) scratch-buffer-name))
+          (kill-buffer (current-buffer)))))))
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.

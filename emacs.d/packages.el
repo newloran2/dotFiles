@@ -124,13 +124,13 @@
           ("https://www.trueachievements.com/newsrss.aspx" xbox)
           ("https://www.promocaogames.com.br/feeds/posts/default" xbox)
           ("https://sachachua.com/blog/feed/" sasha_Chua emacs)
-          ("https://www.reddit.com/r/macmini/.rss" reddit mac)
+          ;; ("https://www.reddit.com/r/macmini/.rss" reddit mac)
           ("https://macmagazine.com.br/feed/" mac)
           ("https://emacsredux.com/atom.xml" emacs)
           ("http://ergoemacs.org/emacs/blog.xml" mac)
           ("https://irreal.org/blog/?feed=atom" mac)
           ("http://td1p.com/feed/podcast/" podcast podtrash)
-          ("https://jovemnerd.com.br/feed-nerdcast/" podcast nerdcast2))))
+          ;; ("https://jovemnerd.com.br/feed-nerdcast/" podcast nerdcast2))))
 
 
 

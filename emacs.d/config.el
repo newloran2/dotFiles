@@ -4,7 +4,9 @@
 (when (fboundp 'tool-bar-mode) (tool-bar-mode -1))
 (when (fboundp 'menu-bar-mode) (menu-bar-mode -1))
 (when (fboundp 'scroll-bar-mode) (scroll-bar-mode -1))
-(set-frame-font "Source Code Pro 12")
+(set-face-attribute 'default nil :family "FiraCode Nerd Font"
+                    :height 100 
+                    :weight 'semibold)
 (defalias 'yes-or-no-p 'y-or-n-p)
 (electric-pair-mode 1)
 (setq electric-pair-preserve-balance nil)
