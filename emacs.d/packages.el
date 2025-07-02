@@ -130,7 +130,9 @@
           ("http://ergoemacs.org/emacs/blog.xml" mac)
           ("https://irreal.org/blog/?feed=atom" mac)
           ("http://td1p.com/feed/podcast/" podcast podtrash)
-          ;; ("https://jovemnerd.com.br/feed-nerdcast/" podcast nerdcast2))))
+          )
+        )
+  )
 
 
 
@@ -145,6 +147,7 @@
 
 ;; ;; git
 (use-package magit :commands magit)
+(use-package git-timemachine)
 (use-package restclient :defer t)
 (use-package jq-mode :defer t)
 

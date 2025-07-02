@@ -1,0 +1,214 @@
+# hide_cursor_when_typing = true
+
+[colors.cursor]
+cursor = "#528bff"
+text = "CellBackground"
+
+[colors.normal]
+black = "#5c6370"
+blue = "#61afef"
+cyan = "#56b6c2"
+green = "#98c379"
+magenta = "#c678dd"
+red = "#e06c75"
+white = "#828997"
+yellow = "#e5c07b"
+
+[colors.primary]
+background = "#000000"
+foreground = "#abb2bf"
+
+[colors.selection]
+background = "#3e4451"
+text = "CellForeground"
+
+[env]
+TERM = "xterm-256color"
+
+[font]
+size = 10.0
+
+[font.bold]
+family = "FiraCode Nerd Font"
+style = "Bold"
+
+[font.normal]
+family = "FiraCode Nerd Font"
+style = "SemiBold"
+
+[[keyboard.bindings]]
+key = "Comma"
+mods = "Command"
+
+[keyboard.bindings.command]
+args = ["-c", "open ~/.config/alacritty/alacritty.yml"]
+program = "sh"
+
+[[keyboard.bindings]]
+chars = "\u0015"
+key = "Back"
+mods = "Super"
+
+[[keyboard.bindings]]
+chars = "\u001Bb"
+key = "Left"
+mods = "Alt"
+
+[[keyboard.bindings]]
+chars = "\u001Bf"
+key = "Right"
+mods = "Alt"
+
+[[keyboard.bindings]]
+chars = "\u001BOH"
+key = "Left"
+mode = "AppCursor"
+mods = "Command"
+
+[[keyboard.bindings]]
+chars = "\u001BOF"
+key = "Right"
+mode = "AppCursor"
+mods = "Command"
+
+[[keyboard.bindings]]
+chars = "\u001Bb:"
+key = "Semicolon"
+mods = "Command"
+
+[[keyboard.bindings]]
+chars = "\u001Bb\""
+key = "D"
+mods = "Command|Shift"
+
+[[keyboard.bindings]]
+chars = "\u001Bb%"
+key = "D"
+mods = "Command"
+
+[[keyboard.bindings]]
+chars = "\u001Bbx"
+key = "W"
+mods = "Command"
+
+[[keyboard.bindings]]
+chars = "\u001Bbc"
+key = "T"
+mods = "Command"
+
+[[keyboard.bindings]]
+chars = "\u001Bbo"
+key = "O"
+mods = "Command"
+
+[[keyboard.bindings]]
+chars = "\u001Bb0"
+key = "Key0"
+mods = "Command"
+
+[[keyboard.bindings]]
+chars = "\u001Bb1"
+key = "Key1"
+mods = "Command"
+
+[[keyboard.bindings]]
+chars = "\u001Bb2"
+key = "Key2"
+mods = "Command"
+
+[[keyboard.bindings]]
+chars = "\u001Bb3"
+key = "Key3"
+mods = "Command"
+
+[[keyboard.bindings]]
+chars = "\u001Bb4"
+key = "Key4"
+mods = "Command"
+
+[[keyboard.bindings]]
+chars = "\u001Bb5"
+key = "Key5"
+mods = "Command"
+
+[[keyboard.bindings]]
+chars = "\u001Bb6"
+key = "Key6"
+mods = "Command"
+
+[[keyboard.bindings]]
+chars = "\u001Bb7"
+key = "Key7"
+mods = "Command"
+
+[[keyboard.bindings]]
+chars = "\u001Bb8"
+key = "Key8"
+mods = "Command"
+
+[[keyboard.bindings]]
+chars = "\u001Bb9"
+key = "Key9"
+mods = "Command"
+
+[[keyboard.bindings]]
+chars = "\u001Bbq"
+key = "V"
+mods = "Command|Shift"
+
+[[keyboard.bindings]]
+chars = "\u001Bbb"
+key = "B"
+mods = "Command"
+
+[[keyboard.bindings]]
+chars = "\u001Bbz"
+key = "F"
+mods = "Command|Shift"
+
+[[keyboard.bindings]]
+chars = "\u001Bbs"
+key = "S"
+mods = "Command|Shift"
+
+[[keyboard.bindings]]
+chars = "\u001Bb("
+key = "LBracket"
+mods = "Command"
+
+[[keyboard.bindings]]
+chars = "\u001Bb)"
+key = "RBracket"
+mods = "Command"
+
+[[keyboard.bindings]]
+chars = "\u001Bf"
+key = "F"
+mods = "Alt"
+
+[[keyboard.bindings]]
+chars = "\u001Bb"
+key = "B"
+mods = "Alt"
+
+[[keyboard.bindings]]
+chars = "\u001Bd"
+key = "D"
+mods = "Alt"
+
+[selection]
+save_to_clipboard = true
+
+[terminal.shell]
+args = ["new-session", "-A", "-D", "-s", "main"]
+program = "/opt/homebrew/bin/tmux"
+
+[window]
+decorations = "buttonless"
+option_as_alt = "Both"
+
+[window.padding]
+x = 2
+y = 2
+
+[terminal]

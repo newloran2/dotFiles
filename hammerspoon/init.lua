@@ -1,14 +1,13 @@
 hs.loadSpoon("SpoonInstall")
 --hs.loadSpoon("LeftRightHotkey")
 Install = spoon.SpoonInstall
-windowHyper = { 'cmd', 'alt', 'ctrl' }
+windowHyper = { 'shift', 'alt', 'ctrl' }
 appHyper = { 'cmd', 'alt', 'ctrl', 'shift' }
 mouseHyper = { 'cmd', 'alt', 'ctrl', 'shift' }
-moveHyper = { 'rightcmd' }
+moveHyper = { 'alt', 'cmd' }
 
 
 hs.mouse.setAbsolutePosition = true
-
 hs.window.animationDuration = 0.1
 
 
@@ -84,8 +83,12 @@ function focusOrExecute(appName, command)
                 end)
             end
         else
-            runCommand(command, function()
-                hs.application.launchOrFocus(appName)
+           runCommand(command, function()
+                if appName ~= nil then
+                   hs.application.launchOrFocus(appName)
+                else
+                   return true
+                end
             end)
         end
     end
@@ -93,6 +96,9 @@ end
 
 function emacsclient()
     hs.execute("~/.hammerspoon/emacsclientOrEmacs.sh")
+end
+function taskwarriorTui()
+    runCommand([[ /opt/homebrew/bin/alacritty -e /bin/zsh -l -c '/opt/homebrew/bin/taskwarrior-tui' ]])
 end
 
 function playYoutubeLink()
@@ -120,9 +126,19 @@ function launchAppOrFocus(app)
     end
 end
 
+--hs.grid.setGrid('10x4')
+
+-- hs.grid.HINTS={
+--     { '1', '2', '3', '4', '5', '6', '7', '8', '9', '0' },
+--     { 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ';' }, -- Adicionado um espaço vazio para completar 10 colunas
+--     { 'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p' },
+--     { 'z', 'x', 'c', 'v', 'b', 'n', 'm', ',', '.', '/' },
+-- --    { 'Z', 'X', 'C', 'V', 'B', 'N', 'M', ',', '.', '/' },
+-- }
+
+hs.grid.ui.showExtraKeys = false
 hs.grid.setGrid('10x4')
-hs.grid.ui.textSize = 90
-hs.grid.ui.showExtraKeys = true
+hs.grid.ui.textSize = 30
 
 bind("G", windowHyper, hs.grid.show)
 
@@ -133,6 +149,8 @@ bind("e", appHyper, launchAppOrFocus('Sublime text'))
 bind("b", appHyper, launchAppOrFocus('Safari'))
 bind("m", appHyper, launchAppOrFocus('Activity Monitor'))
 bind("i", appHyper, launchAppOrFocus('Mail'))
+bind("=", appHyper, launchAppOrFocus('Proxyman'))
+bind("0", appHyper, taskwarriorTui)
 
 
 -- binds de moviento de janelas
@@ -158,6 +176,12 @@ bind("=", windowHyper, resizeWindow("down"))
 bind("left", windowHyper, resizeWindow("left"))
 bind("right", windowHyper, resizeWindow("right"))
 
+
+bind("right", moveHyper, moveWindow("right"))
+bind("left", moveHyper, moveWindow("left"))
+bind("up", moveHyper, moveWindow("up"))
+bind("down", moveHyper, moveWindow("down"))
+
 -- configuração para botões do g604
 -- foi configurado no mouse um windowHyper com botões de 0 a 9
 -- os botões de clique 1, 2, rolamento e clique do meio continuam sem alterações
@@ -176,22 +200,53 @@ bind("7", mouseHyper, hs.spaces.toggleLaunchPad)
 
 
 
-local rightCmdKeyCode = 54 -- Código da tecla Cmd direita
 
-local rightCmdTap = hs.eventtap.new({ hs.eventtap.event.types.flagsChanged }, function(event)
-    -- Verifica se o Cmd direito está pressionado
-    local flags = event:getFlags()
-    local keyCode = event:getKeyCode()
-    local isRightCmd = keyCode == rightCmdKeyCode and flags.cmd
 
-    -- hs.alert.show("pressionado: " .. keyCode)
-    if isRightCmd then
-        hs.alert.show("Cmd Direito pressionado! " .. hs.inspect.inspect(hs.keycodes.map.a))
-        -- Faça algo aqui
+
+
+
+
+
+function rightClick()
+  local pos = hs.mouse.absolutePosition()
+  hs.eventtap.leftClick(pos)
+end
+
+local rightClickFlag = false
+local mouseEventButtonNumber = hs.eventtap.event.properties.mouseEventButtonNumber
+
+function sideMouseBtnDown(evenObj)
+  if eventObj:getProperty(mouseEventButtonNumber) == 2 then
+    rMD:start()
+    return true
+  end
+end
+
+function sideMouseBtnUp(eventObj)
+  if eventObj:getProperty(mouseEventButtonNumber) == 2 then
+    if rightClickFlag then
+      rightClickFlag = false
+      rightClick()
     end
+  end
 
-    return false -- Não bloqueia o evento
+  return true
+end   
+
+local sMU = hs.eventtap.new({hs.eventtap.event.types.otherMouseUp}, sideMouseBtnUp):start()
+local sMD = hs.eventtap.new({hs.eventtap.event.types.otherMouseDown}, sideMouseBtnDown):start()
+local rMD = hs.eventtap.new({hs.eventtap.event.types.rightMouseDown}, function ()
+  rightClickFlag = true
+  rMD:stop()
+  rightClick()
+  rightClick()
 end)
 
--- Inicia o evento
-rightCmdTap:start()
+
+
+local sMD = hs.eventtap.new({hs.eventtap.event.types.otherMouseDown}, function (eventObj)
+  local btnNumber = eventObj:getProperty(hs.eventtap.event.properties.mouseEventButtonNumber)
+  print("mouse button number: " .. btnNumber)
+end):start()
+
+
