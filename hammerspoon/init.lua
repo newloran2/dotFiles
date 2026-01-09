@@ -7,13 +7,148 @@ mouseHyper = { 'cmd', 'alt', 'ctrl', 'shift' }
 moveHyper = { 'alt', 'cmd' }
 
 
+
 hs.mouse.setAbsolutePosition = true
 hs.window.animationDuration = 0.1
+
+-- Estilo customizado para alertas
+hs.alert.defaultStyle = {
+    strokeColor = { alpha = 0 },
+    strokeWidth = 2,
+    fillColor = { red = 0.1, green = 0.1, blue = 0.1, alpha = 0.85 },
+    radius = 12,
+    textColor = { red = 1, green = 1, blue = 1 },
+    textFont = "Menlo",
+    textSize = 22,
+    padding = 18,
+    atScreenEdge = 0,
+    fadeInDuration = 0.15,
+    fadeOutDuration = 0.25,
+}
 
 
 function bind(key, hyper, func)
     hs.hotkey.bind(hyper, key, func)
 end
+
+--função para criar bind de mouse 
+-- com 3 parametros button recebe o numero do botao do mouse 
+-- pressedButton recebe um botão do mouse que deve estar pressionado enquando button é pressionado pode ser nulo, caso seja nulo o bind funciona com apenas o button for pressionado
+-- app recebe o nome do app que o bind deve funcionar, caso seja nulo funciona globalmente
+-- func é a função que sera executada quanndo o bind for acionado
+
+-- mouse(button, pressedButton, app, fun, isLongPress, numClicks)
+-- isLongPress: se true, faz long press no último clique (default: false)
+-- numClicks: número de cliques a detectar antes de acionar (default: 1)
+function mouse(button, pressedButton, app, fun, isLongPress, numClicks, alertText)
+
+    isLongPress = isLongPress or false
+    numClicks = numClicks or 1
+    local clickCount = 0
+    local lastClickTime = 0
+    local mouseDownTime = 0
+    local clickTimeout = 0.2 -- tempo máximo entre cliques para considerar sequência
+    local singleClickTimer = nil
+    local mouseTap
+    mouseTap = hs.eventtap.new(
+        { hs.eventtap.event.types.otherMouseDown, hs.eventtap.event.types.otherMouseUp },
+        function(e)
+            local btn = e:getProperty(hs.eventtap.event.properties.mouseEventButtonNumber)            
+            local eventType = e:getType()
+            local frontApp = hs.application.frontmostApplication():name()
+            local now = hs.timer.secondsSinceEpoch()
+            if btn == button and (pressedButton == nil or hs.eventtap.checkMouseButtons()[pressedButton + 1]) and (app == nil or app == frontApp) then
+                if eventType == hs.eventtap.event.types.otherMouseDown then
+                    if now - lastClickTime > clickTimeout then
+                        clickCount = 1
+                    else
+                        clickCount = clickCount + 1
+                    end
+                    lastClickTime = now
+                    if clickCount == numClicks then
+                        mouseDownTime = now
+                    end
+                    return false
+                elseif eventType == hs.eventtap.event.types.otherMouseUp then
+                    if clickCount == numClicks then
+                        local heldTime = now - mouseDownTime
+                        if isLongPress and heldTime > 0.5 then
+                            fun()
+                            print("botao: " .. btn)
+                            if alertText ~= nil then
+                                hs.alert.show(alertText)
+                            end
+                            clickCount = 0
+                        elseif not isLongPress and heldTime <= 0.5 then
+                            if numClicks == 1 then
+                                -- Adia o single click se houver handler de double click
+                                if singleClickTimer then
+                                    singleClickTimer:stop()
+                                    singleClickTimer = nil
+                                end
+                                singleClickTimer = hs.timer.doAfter(clickTimeout, function()
+                                    -- Só executa se não houve segundo clique
+                                    if clickCount == 1 then
+                                        fun()
+                                        print("botao: " .. btn)
+                                        if alertText ~= nil then
+                                            hs.alert.show(alertText)
+                                        end
+                                    end
+                                    clickCount = 0
+                                    singleClickTimer = nil
+                                end)
+                            else
+                                fun()
+                                print("botao: " .. btn)
+                                if alertText ~= nil then
+                                    hs.alert.show(alertText)
+                                end
+                                clickCount = 0
+                            end
+                        elseif not isLongPress and numClicks > 1 and heldTime <= 0.5 then
+                            fun()
+                            print("botao: " .. btn)
+                            if alertText ~= nil then
+                                hs.alert.show(alertText)
+                            end
+                            clickCount = 0
+                        end
+                    end
+                end
+            else
+                clickCount = 0
+                if singleClickTimer then
+                    singleClickTimer:stop()
+                    singleClickTimer = nil
+                end
+            end
+            return false
+        end
+    )
+    mouseTap:start()
+end
+
+
+-- função que dispara um keypress 
+-- parametro key é a tecla que sera pressionada
+-- parametro mods são os modificadores que devem ser pressionados junto com a tecla
+function keyPress(key, mods)
+    return function() hs.eventtap.keyStroke(mods, key) end
+end
+
+
+-- função que executa uma serie de funções em sequencia 
+-- posso passar um tempo para esperar entre cada função
+function runInSequence(funcs, delay)
+    delay = delay or 0.01
+    return function()
+        for i, func in ipairs(funcs) do
+            hs.timer.doAfter((i - 1) * delay, func)
+        end
+    end
+end
+
 
 function positionWindow(x, y, w, h)
     -- o posiocionamento funciona da seguinte forma
@@ -22,6 +157,7 @@ function positionWindow(x, y, w, h)
     -- y a mesma logica do x
     -- h e w são a altura e a largura e se aplicam na mesma logica de x
     return function()
+        hs.printf("position window chamado")
         local win = hs.window.focusedWindow()
         hs.grid.set(win, hs.geometry.rect(x, y, w, h))
     end
@@ -56,6 +192,26 @@ function moveWindow(direction)
         end
     end
 end
+
+-- move uma janela para a posição position e redimensiona para size
+
+-- x, y, w, h devem ser valores entre 0 e 1 (porcentagem da tela)
+function moveAndResizeWindow(x, y, w, h)
+    return function()
+        local win = hs.window.focusedWindow()
+        if win then
+            local screen = win:screen()
+            local frame = screen:frame()
+            win:setFrame({
+                x = frame.x + frame.w * x,
+                y = frame.y + frame.h * y,
+                w = frame.w * w,
+                h = frame.h * h
+            })
+        end
+    end
+end
+
 
 -- Função para executar um comando de linha de comando
 function runCommand(command, callback)
@@ -126,16 +282,6 @@ function launchAppOrFocus(app)
     end
 end
 
---hs.grid.setGrid('10x4')
-
--- hs.grid.HINTS={
---     { '1', '2', '3', '4', '5', '6', '7', '8', '9', '0' },
---     { 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ';' }, -- Adicionado um espaço vazio para completar 10 colunas
---     { 'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p' },
---     { 'z', 'x', 'c', 'v', 'b', 'n', 'm', ',', '.', '/' },
--- --    { 'Z', 'X', 'C', 'V', 'B', 'N', 'M', ',', '.', '/' },
--- }
-
 hs.grid.ui.showExtraKeys = false
 hs.grid.setGrid('10x4')
 hs.grid.ui.textSize = 30
@@ -181,72 +327,42 @@ bind("right", moveHyper, moveWindow("right"))
 bind("left", moveHyper, moveWindow("left"))
 bind("up", moveHyper, moveWindow("up"))
 bind("down", moveHyper, moveWindow("down"))
-
--- configuração para botões do g604
--- foi configurado no mouse um windowHyper com botões de 0 a 9
--- os botões de clique 1, 2, rolamento e clique do meio continuam sem alterações
--- o atalahos estão setados no mouse da seguinte forma
--- botões laterais de traz para frente: 2,3,4
--- botões laterais de baixo de tr   az para frente: 4,6,7
--- botão + 1
--- botão - 0
--- scroll para esquerda 9
--- scroll para direita 8
-bind("1", mouseHyper, hs.spaces.toggleShowDesktop)
-bind("5", mouseHyper, hs.spaces.toggleMissionControl)
-bind("6", mouseHyper, hs.spaces.toggleAppExpose)
-bind("7", mouseHyper, hs.spaces.toggleLaunchPad)
-
-
-
-
-
-
-
-
-
-
-
-function rightClick()
-  local pos = hs.mouse.absolutePosition()
-  hs.eventtap.leftClick(pos)
-end
-
-local rightClickFlag = false
-local mouseEventButtonNumber = hs.eventtap.event.properties.mouseEventButtonNumber
-
-function sideMouseBtnDown(evenObj)
-  if eventObj:getProperty(mouseEventButtonNumber) == 2 then
-    rMD:start()
-    return true
-  end
-end
-
-function sideMouseBtnUp(eventObj)
-  if eventObj:getProperty(mouseEventButtonNumber) == 2 then
-    if rightClickFlag then
-      rightClickFlag = false
-      rightClick()
-    end
-  end
-
-  return true
-end   
-
-local sMU = hs.eventtap.new({hs.eventtap.event.types.otherMouseUp}, sideMouseBtnUp):start()
-local sMD = hs.eventtap.new({hs.eventtap.event.types.otherMouseDown}, sideMouseBtnDown):start()
-local rMD = hs.eventtap.new({hs.eventtap.event.types.rightMouseDown}, function ()
-  rightClickFlag = true
-  rMD:stop()
-  rightClick()
-  rightClick()
+--bind para limpar o console do hammerspoon e recarregar a configuração
+bind("r", windowHyper, function()
+    hs.console.clearConsole()
+    hs.reload()
 end)
 
 
+-- mouse binds
 
-local sMD = hs.eventtap.new({hs.eventtap.event.types.otherMouseDown}, function (eventObj)
-  local btnNumber = eventObj:getProperty(hs.eventtap.event.properties.mouseEventButtonNumber)
-  print("mouse button number: " .. btnNumber)
-end):start()
+function echoDesktop()
+    hs.spaces.toggleShowDesktop()
+end
 
 
+--mouse(button, pressedButton, app, fun)
+-- mouse(9, 3, "Alacritty", echoDesktop)
+mouse(2,  nil, "Xcode",  keyPress("K", {"cmd"}))
+mouse(4,  nil, "Xcode",  keyPress(".", {"cmd"}), false, 2, "stop")
+-- mouse(4,  nil, "Xcode",  function() print("teste") end, false, 1, "teste")
+mouse(4,  nil, "Xcode",  function() print("zica") end, true, 2, "zica")
+mouse(4,  nil, "Xcode",  keyPress("r", {"cmd"}), true, 1 , "run")
+mouse(5,  nil, "Xcode",  launchAppOrFocus('Simulator'))
+mouse(8,  nil, "Xcode",  launchAppOrFocus('Proxyman'))
+mouse(11, nil, "Xcode",  keyPress("Y", {"cmd", "shift"}))
+mouse(12, nil, "Xcode",  launchAppOrFocus('Safari'))
+
+mouse(2,  nil, "Simulator", runInSequence({ launchAppOrFocus('Xcode'), keyPress("K", {"cmd"}), launchAppOrFocus('Simulator'),}))
+mouse(4,  nil, "Simulator", runInSequence({ launchAppOrFocus('Xcode'), keyPress("r", {"cmd"}), launchAppOrFocus('Simulator'),}, 0.5), true, 1, "run simulator")
+mouse(4,  nil, "Simulator", runInSequence({ launchAppOrFocus('Xcode'), keyPress(".", {"cmd"}), launchAppOrFocus('Simulator'),}, 0.2), false, 2, "stop simulator")
+mouse(5,  nil, "Simulator",  launchAppOrFocus('Xcode'))
+mouse(16, nil, "Simulator", moveAndResizeWindow(0.01, 0.3, 0.2, 0.6))
+mouse(17, nil, "Simulator", moveAndResizeWindow(0.81, 0.3, 0.2, 0.6))
+mouse(8, nil, "Proxyman",  launchAppOrFocus('Xcode'))
+-- mouse(5, nil, "Proxyman",  launchAppOrFocus('Simulator'))
+
+mouse(16,  nil, 'Safari',  keyPress("left", {"cmd"})) -- pagina anterior
+mouse(17,  nil, 'Safari',  keyPress("right", {"cmd"})) -- pagina seguinte
+mouse(3,  9, 'Safari',  keyPress("tab", {"ctrl", "shift"})) -- proxima aba
+mouse(4,  9, 'Safari',  keyPress("tab", {"ctrl"})) -- aba anterior
