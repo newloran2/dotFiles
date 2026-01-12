@@ -1,0 +1,7 @@
+{
+  "name": "MouseHandler",
+  "description": "Spoon para manipulação de mouse buttons customizados, permitindo configuração de funções para cada botão e integração por app.",
+  "author": "Erik Clemnente",
+  "version": "1.0.0",
+  "license": "MIT"
+}

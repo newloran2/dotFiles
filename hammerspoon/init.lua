@@ -8,6 +8,21 @@ mouseHyper = { 'cmd', 'alt', 'ctrl', 'shift' }
 moveHyper = { 'alt', 'cmd' }
 
 
+lastWindow = nil
+
+function Hammerspoon() launchAppOrFocus("Hammerspoon")() end
+function Safari() launchAppOrFocus("Safari")() end
+function Xcode() launchAppOrFocus("Xcode")() end
+function Simulator() launchAppOrFocus("Simulator")() end
+function Alacritty() launchAppOrFocus("Alacritty")() end
+function Proxyman() launchAppOrFocus("Proxyman")() end
+
+function LastApp() 
+	if LastActivatedApp then 
+		LastActivatedApp:activate()
+	end
+end
+
 
 hs.mouse.setAbsolutePosition = true
 hs.window.animationDuration = 0.1
@@ -26,6 +41,11 @@ hs.alert.defaultStyle = {
     fadeInDuration = 0.15,
     fadeOutDuration = 0.25,
 }
+
+
+LastActivatedApp = nil
+
+
 
 function bind(key, hyper, func)
     hs.hotkey.bind(hyper, key, func)
@@ -88,9 +108,8 @@ function moveWindow(direction)
 		elseif direction == "right" then
 			hs.grid.pushWindowRight(win)
 		end
-	end
+	 end
 end
-
 -- move uma janela para a posição position e redimensiona para size
 
 -- x, y, w, h devem ser valores entre 0 e 1 (porcentagem da tela)
@@ -186,7 +205,7 @@ hs.hotkey.bind(windowHyper, "G", function()
 end)
 
 local log = hs.logger.new("mpv", "info")
-function mpv(url)
+local function mpv(url)
     log.i("mpv() chamada")
 
     if not url or url == "" then
@@ -254,6 +273,10 @@ function mpv(url)
 end
 local mouseTap = nil
 local currentMouseDown = {}
+
+--TODO: implementar long press 
+--TODO: implementar double click 
+--TODO: scroll do mouse
 function mouse(config)
 	mouseTap = hs.eventtap.new(
 		{ hs.eventtap.event.types.otherMouseDown, hs.eventtap.event.types.otherMouseUp },
@@ -273,6 +296,7 @@ function mouse(config)
 			if m == "mouseDown" then
 				currentMouseDown[bName] = true
 				hs.printf("Mouse down = %s", bName)
+
 				return false
 			end
 			if m == "mouseUp" then
@@ -319,9 +343,7 @@ function mouse(config)
 	mouseTap:start()
 end
 
-function Safari()
-	launchAppOrFocus("Safari")()
-end
+
 
 
 function checkYoutubeLinkUnderMouse()
@@ -373,45 +395,23 @@ function checkYoutubeLinkUnderMouse()
 	end
 end
 
-function Hammerspoon()
-   launchAppOrFocus("Hammerspoon")()
+
+function isPointToLink()
+	local mousePoint = hs.mouse.absolutePosition()
+	local app = hs.application.frontmostApplication()
+	local axApp = hs.axuielement.applicationElement(app)
+		if not axApp then
+		-- hs.alert.show("Acessibilidade não disponível para o " .. app:name())
+		return false
+	end
+
+	local elem = axApp:elementAtPosition(mousePoint.x, mousePoint.y):attributeValue("AXParent")
+	if not tostring(elem):find('AXLink') then
+		-- hs.alert.show("Nenhum elemento sob o mouse")
+		return  false
+	end
+	return true
 end
-
--- uma função que verifica se o mouse está em cima de um link de video no youtue e caso verdadeiro tenta tocar esse video no mpv
-
-local mouseConfig = {
-	Safari = {
-		b3 = { emacsclient, press = "b9" },
-		b4 = { Hammerspoon, c = "a", emacsclient, press = "b9" },
-		b15 = { keyPress("w", { "cmd" }) },
-		b16 = { keyPress("left", { "cmd" }) },
-		b17 = { keyPress("right", { "cmd" }) },
-		-- b5 = { checkYoutubeLinkUnderMouse },
-	},
-	Hammerspoon = {
-		b3 = { Safari, press = "b9" },
-		b17 = { moveAndResizeWindow(0.81, 0.05, 0.2, 0.6) },
-	},
-	Emacs = {
-		b2 = {
-			runInSequence({
-				keyPress("escape", {}),
-				keyPress("up", {}),
-			}),
-		},
-		b3 = { Safari },
-		b4 = { Hammerspoon },
-		b16 = { positionWindow({ x = 0, y = 0, w = 5, h = 4 }) },
-		b17 = { positionWindow({ x = 5, y = 0, w = 5, h = 4 }) },
-		b14 = {
-			function()
-				print("teste")
-			end,
-		},
-	},
-}
-
-mouse(mouseConfig)
 
 bind("t", appHyper, launchAppOrFocus("Teams"))
 bind("p", appHyper, emacsclient)
@@ -455,3 +455,87 @@ bind("r", windowHyper, function()
 	hs.console.clearConsole()
 	hs.reload()
 end)
+
+mouse = hs.loadSpoon("MouseHandler")
+mouse:start({
+	Safari = {
+		-- b2 = {
+		-- 	function()
+		-- 		-- TODO: o click fora do link funciona mas se clicar no link precisa abrir ele
+		-- 		if not isPointToLink() then
+		-- 			keyPress("w", { "cmd" })()
+		-- 		end
+		-- 		return true
+		-- 	end,
+		-- },
+		b12 = { click = {LastApp} },
+		b16 = { click = {keyPress("left", { "cmd" })} },
+		b17 = { click = {keyPress("right", { "cmd" })} },
+		b10 = { click = {keyPress("tab", { "ctrl" })} },
+		b11 = { click = {keyPress("tab", { "ctrl", "shift" })} },
+		-- b5 = { checkYoutubeLinkUnderMouse },
+	},
+	Xcode = {
+		b2 =  { click = {keyPress("k", { "cmd" })}},
+		-- b3 = { keyPress("1", { "cmd" }),press = "b9" },
+		-- b4 = { keyPress("8", { "cmd" }),press = "b9" },
+		b4 =  { longPress = {keyPress("r", {"cmd"})}, click = {keyPress(".", {"cmd"})} },
+		b5 =  { click = {Simulator} },
+		-- b5 =   {longPress = true, Simulator},  --- immplementar o hide de um app e o long press
+		b8 =  { click = {Proxyman} },
+		b11 = { click = {keyPress("y", { "cmd" , "shift"})}},
+		b12 = { click = {Safari} },
+		
+		-- b14 = { keyPress("0", { "cmd"}) }, -- recisa implementar o evento de button mouse click com modificadores
+		b16 = { click = {keyPress("0", { "cmd"})} },
+		b17 = { click = {keyPress("f13", { "cmd", "alt" })} },
+	},
+	Simulator = {
+		b2 = {click = {runInSequence({
+				-- saveWindowsLayout, -- TODO:  implementar salvar layout de janelas				
+				Xcode,
+				keyPress("k", {"cmd"}),
+				Simulator
+				-- restoreWindowsLayout -- TODO: implementar restaurar layout de janelas
+			})},
+		},
+		b5 = { click = {Xcode }},
+		b6 = { click = {runInSequence({
+				Xcode, 
+				keyPress(".", { "cmd"}),
+				function()
+					runCommand("xcrun simctl uninstall booted  br.com.uol.batepapo.iphone", function ()
+						hs.alert.show("App desinstalado do simulador!")
+					end)
+				end
+			})}
+		},
+		b8 = { click = {Proxyman }},
+		b12 = { click = {Safari }},
+		b16 = { click = {moveAndResizeWindow(0.01, 0.05, 0.25, 0.5)}},
+		b17 = { click = {moveAndResizeWindow(0.88, 0.05, 0.4, 0.5)}},
+
+	},
+	Hammerspoon = {
+		b3 = { click = {
+			hs.spaces.toggleMissionControl, press = "b9"
+		}},
+		b4 = { longPress = {
+			function ()
+				hs.alert.show("reload and clearConsole")
+				hs.console.clearConsole()
+				-- hs.reload()
+			end
+		}, click = {function ()
+				hs.alert.show("clearConsole")
+				hs.console.clearConsole()
+			end}, doubleClick = {
+				function ()
+				hs.alert.show("b4 doubleClick")
+			end
+			} 
+		},
+	},
+})
+
+
