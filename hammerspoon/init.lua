@@ -1,6 +1,6 @@
 hs.loadSpoon("SpoonInstall")
 Install = spoon.SpoonInstall
-Install:andUse("GridTile")
+-- Install:andUse("GridTile")
 
 windowHyper = { 'shift', 'alt', 'ctrl' }
 appHyper = { 'cmd', 'alt', 'ctrl', 'shift' }
@@ -11,35 +11,39 @@ moveHyper = { 'alt', 'cmd' }
 lastWindow = nil
 
 function Hammerspoon() launchAppOrFocus("Hammerspoon")() end
+
 function Safari() launchAppOrFocus("Safari")() end
+
 function Xcode() launchAppOrFocus("Xcode")() end
+
 function Simulator() launchAppOrFocus("Simulator")() end
+
 function Alacritty() launchAppOrFocus("Alacritty")() end
+
 function Proxyman() launchAppOrFocus("Proxyman")() end
 
-function LastApp() 
-	if LastActivatedApp then 
-		LastActivatedApp:activate()
-	end
+function LastApp()
+   if LastActivatedApp then
+      LastActivatedApp:activate()
+   end
 end
-
 
 hs.mouse.setAbsolutePosition = true
 hs.window.animationDuration = 0.1
 
 -- Estilo customizado para alertas
 hs.alert.defaultStyle = {
-    strokeColor = { alpha = 0 },
-    strokeWidth = 2,
-    fillColor = { red = 0.1, green = 0.1, blue = 0.1, alpha = 0.85 },
-    radius = 12,
-    textColor = { red = 1, green = 1, blue = 1 },
-    textFont = "Menlo",
-    textSize = 22,
-    padding = 18,
-    atScreenEdge = 0,
-    fadeInDuration = 0.15,
-    fadeOutDuration = 0.25,
+   strokeColor = { alpha = 0 },
+   strokeWidth = 2,
+   fillColor = { red = 0.1, green = 0.1, blue = 0.1, alpha = 0.85 },
+   radius = 12,
+   textColor = { red = 1, green = 1, blue = 1 },
+   textFont = "Menlo",
+   textSize = 22,
+   padding = 18,
+   atScreenEdge = 0,
+   fadeInDuration = 0.15,
+   fadeOutDuration = 0.25,
 }
 
 
@@ -48,374 +52,373 @@ LastActivatedApp = nil
 
 
 function bind(key, hyper, func)
-    hs.hotkey.bind(hyper, key, func)
+   hs.hotkey.bind(hyper, key, func)
 end
 
 -- função que dispara um keypress
 -- parametro key é a tecla que sera pressionada
 -- parametro mods são os modificadores que devem ser pressionados junto com a tecla
-function keyPress(key, mods, application)    
-    return function() hs.eventtap.keyStroke(mods, key, 200, application) end
+function keyPress(key, mods, application)
+   return function() hs.eventtap.keyStroke(mods, key, 200, application) end
 end
 
--- função que executa uma serie de funções em sequencia 
+-- função que executa uma serie de funções em sequencia
 -- posso passar um tempo para esperar entre cada função
 function runInSequence(funcs, delay)
-    delay = delay or 0.01
-    return function()
-        for i, func in ipairs(funcs) do
-            hs.timer.doAfter((i - 1) * delay, func)
-        end
-    end
+   delay = delay or 0.01
+   return function()
+      for i, func in ipairs(funcs) do
+         hs.timer.doAfter((i - 1) * delay, func)
+      end
+   end
 end
 
 function positionWindow(x, y, w, h)
-    -- o posiocionamento funciona da seguinte forma
-    -- o gid configurado sendo 9x4
-    -- x pode ser de 0 a 9 se passar do tamanho maximo considera o tamanho maximo
-    -- y a mesma logica do x
-    -- h e w são a altura e a largura e se aplicam na mesma logica de x
-    return function()
-        local win = hs.window.focusedWindow()
-        hs.grid.set(win, hs.geometry.rect(x, y, w, h))
-    end
+   -- o posiocionamento funciona da seguinte forma
+   -- o gid configurado sendo 9x4
+   -- x pode ser de 0 a 9 se passar do tamanho maximo considera o tamanho maximo
+   -- y a mesma logica do x
+   -- h e w são a altura e a largura e se aplicam na mesma logica de x
+   return function()
+      local win = hs.window.focusedWindow()
+      hs.grid.set(win, hs.geometry.rect(x, y, w, h))
+   end
 end
 
 function resizeWindow(direction)
-    return function()
-        local win = hs.window.focusedWindow()
-        if direction == "up" then
-            hs.grid.resizeWindowShorter(win)
-        elseif direction == "down" then
-            hs.grid.resizeWindowTaller(win)
-        elseif direction == "left" then
-            hs.grid.resizeWindowThinner(win)
-        elseif direction == "right" then
-            hs.grid.resizeWindowWider(win)
-        end
-    end
+   return function()
+      local win = hs.window.focusedWindow()
+      if direction == "up" then
+         hs.grid.resizeWindowShorter(win)
+      elseif direction == "down" then
+         hs.grid.resizeWindowTaller(win)
+      elseif direction == "left" then
+         hs.grid.resizeWindowThinner(win)
+      elseif direction == "right" then
+         hs.grid.resizeWindowWider(win)
+      end
+   end
 end
 
 function moveWindow(direction)
-	return function()
-		local win = hs.window.focusedWindow()
-		if direction == "up" then
-			hs.grid.pushWindowUp(win)
-		elseif direction == "down" then
-			hs.grid.pushWindowDown(win)
-		elseif direction == "left" then
-			hs.grid.pushWindowLeft(win)
-		elseif direction == "right" then
-			hs.grid.pushWindowRight(win)
-		end
-	 end
+   return function()
+      local win = hs.window.focusedWindow()
+      if direction == "up" then
+         hs.grid.pushWindowUp(win)
+      elseif direction == "down" then
+         hs.grid.pushWindowDown(win)
+      elseif direction == "left" then
+         hs.grid.pushWindowLeft(win)
+      elseif direction == "right" then
+         hs.grid.pushWindowRight(win)
+      end
+   end
 end
+
 -- move uma janela para a posição position e redimensiona para size
 
 -- x, y, w, h devem ser valores entre 0 e 1 (porcentagem da tela)
 function moveAndResizeWindow(x, y, w, h)
-    return function()
-        local win = hs.window.focusedWindow()
-        if win then
-            local screen = win:screen()
-            local frame = screen:frame()
-            win:setFrame({
-                x = frame.x + frame.w * x,
-                y = frame.y + frame.h * y,
-                w = frame.w * w,
-                h = frame.h * h
-            })
-        end
-    end
+   return function()
+      local win = hs.window.focusedWindow()
+      if win then
+         local screen = win:screen()
+         local frame = screen:frame()
+         win:setFrame({
+            x = frame.x + frame.w * x,
+            y = frame.y + frame.h * y,
+            w = frame.w * w,
+            h = frame.h * h
+         })
+      end
+   end
 end
 
 -- Função para executar um comando de linha de comando
 function runCommand(command, callback)
-    hs.task.new("/bin/bash", function()
-        if callback then
-            callback()
-        end
-    end, function(task, stdout, stderr)
-    end, { "-c", command }):start()
+   hs.task.new("/bin/bash", function()
+      if callback then
+         callback()
+      end
+   end, function(task, stdout, stderr)
+   end, { "-c", command }):start()
 end
 
 function focusOrExecute(appName, command)
-    return function()
-        local app = hs.application.find(appName)
-        if app then
-            local window = app:mainWindow()
-            if window then
-                hs.application.launchOrFocus(appName)
-            else
-                runCommand(command, function()
-                    hs.application.launchOrFocus(appName)
-                end)
-            end
-        else
-           runCommand(command, function()
-                if appName ~= nil then
-                   hs.application.launchOrFocus(appName)
-                else
-                   return true
-                end
+   return function()
+      local app = hs.application.find(appName)
+      if app then
+         local window = app:mainWindow()
+         if window then
+            hs.application.launchOrFocus(appName)
+         else
+            runCommand(command, function()
+               hs.application.launchOrFocus(appName)
             end)
-        end
-    end
+         end
+      else
+         runCommand(command, function()
+            if appName ~= nil then
+               hs.application.launchOrFocus(appName)
+            else
+               return true
+            end
+         end)
+      end
+   end
 end
 
 function emacsclient()
-    hs.execute("~/.hammerspoon/emacsclientOrEmacs.sh")
+   hs.execute("~/.hammerspoon/emacsclientOrEmacs.sh")
 end
+
 function taskwarriorTui()
-    runCommand([[ /opt/homebrew/bin/alacritty -e /bin/zsh -l -c '/opt/homebrew/bin/taskwarrior-tui' ]])
+   runCommand([[ /opt/homebrew/bin/alacritty -e /bin/zsh -l -c '/opt/homebrew/bin/taskwarrior-tui' ]])
 end
 
 function playYoutubeLink()
-    local button, text = hs.dialog.textPrompt(
-        "Youtube URL",
-        "entre sua url",
-        "",
-        "Tocar",
-        "Cancelar"
-    )
+   local button, text = hs.dialog.textPrompt(
+      "Youtube URL",
+      "entre sua url",
+      "",
+      "Tocar",
+      "Cancelar"
+   )
 
-    if button == "Tocar" and text ~= "" then
-        runCommnad("mpv --profile=yt-mid " .. text, function() end)
-    end
+   if button == "Tocar" and text ~= "" then
+      runCommnad("mpv --profile=yt-mid " .. text, function() end)
+   end
 end
 
-function scroll(position, mods)    
-    local scrollEvent = hs.eventtap.event.newScrollEvent({ -1, 0 }, {}, "pixel")
-    scrollEvent:post()
+function scroll(position, mods)
+   local scrollEvent = hs.eventtap.event.newScrollEvent({ -1, 0 }, {}, "pixel")
+   scrollEvent:post()
 end
 
 function launchAppOrFocus(app)
-    return function()
-        hs.application.launchOrFocus(app)
-    end
+   return function()
+      hs.application.launchOrFocus(app)
+   end
 end
 
 hs.grid.ui.showExtraKeys = false
 hs.grid.setGrid('10x4')
 hs.grid.ui.textSize = 30
 
--- bind("G", windowHyper, hs.grid.show)
-hs.hotkey.bind(windowHyper, "G", function()
-    spoon.GridTile:start()
-end)
+bind("G", windowHyper, hs.grid.show)
+-- hs.hotkey.bind(windowHyper, "G", function()
+--    spoon.
+-- GridTile:start()
+-- end)
 
 local log = hs.logger.new("mpv", "info")
 local function mpv(url)
-    log.i("mpv() chamada")
+   log.i("mpv() chamada")
 
-    if not url or url == "" then
-        log.e("URL não informada")
-        hs.notify.new({
-            title = "mpv",
-            informativeText = "URL não informada"
-        }):send()
-        return
-    end
+   if not url or url == "" then
+      log.e("URL não informada")
+      hs.notify.new({
+         title = "mpv",
+         informativeText = "URL não informada"
+      }):send()
+      return
+   end
 
-    log.i("URL recebida: " .. url)
+   log.i("URL recebida: " .. url)
 
-    local socket = "/tmp/mpv-socket"
-    log.i("Socket configurado: " .. socket)
+   local socket = "/tmp/mpv-socket"
+   log.i("Socket configurado: " .. socket)
 
-    -- 1. Garante que a sessão tmux exista
-    log.i("Garantindo sessão tmux 'mpv'")
-    hs.execute("tmux has-session -t mpv 2>/dev/null || tmux new-session -d -s mpv")
+   -- 1. Garante que a sessão tmux exista
+   log.i("Garantindo sessão tmux 'mpv'")
+   hs.execute("tmux has-session -t mpv 2>/dev/null || tmux new-session -d -s mpv")
 
-    -- 2. Verifica se mpv está rodando na sessão tmux
-    log.i("Verificando se o mpv está rodando na sessão tmux")
-    local mpvRunning = hs.execute(
-        "tmux list-panes -t mpv -F '#{pane_pid}' | " ..
-        "xargs -I{} pgrep -P {} mpv 2>/dev/null && echo yes"
-    )
+   -- 2. Verifica se mpv está rodando na sessão tmux
+   log.i("Verificando se o mpv está rodando na sessão tmux")
+   local mpvRunning = hs.execute(
+      "tmux list-panes -t mpv -F '#{pane_pid}' | " ..
+      "xargs -I{} pgrep -P {} mpv 2>/dev/null && echo yes"
+   )
 
-    -- 3. Verifica se o socket existe
-    log.i("Verificando se o socket do mpv existe")
-    local socketExists = hs.execute("[ -S " .. socket .. " ] && echo yes")
+   -- 3. Verifica se o socket existe
+   log.i("Verificando se o socket do mpv existe")
+   local socketExists = hs.execute("[ -S " .. socket .. " ] && echo yes")
 
-    log.i(string.format(
-        "Estado detectado → mpvRunning=%s socketExists=%s",
-        mpvRunning:match("yes") and "yes" or "no",
-        socketExists:match("yes") and "yes" or "no"
-    ))
+   log.i(string.format(
+      "Estado detectado → mpvRunning=%s socketExists=%s",
+      mpvRunning:match("yes") and "yes" or "no",
+      socketExists:match("yes") and "yes" or "no"
+   ))
 
-    if mpvRunning:match("yes") and socketExists:match("yes") then
-        -- 4. mpv rodando → adiciona à playlist via IPC
-        log.i("mpv rodando + socket válido, enviando URL via IPC")
+   if mpvRunning:match("yes") and socketExists:match("yes") then
+      -- 4. mpv rodando → adiciona à playlist via IPC
+      log.i("mpv rodando + socket válido, enviando URL via IPC")
 
-        local cmd = string.format(
-            "echo '{ \"command\": [\"loadfile\", \"%s\", \"append\"] }' | socat - %s",
-            url,
-            socket
-        )
+      local cmd = string.format(
+         "echo '{ \"command\": [\"loadfile\", \"%s\", \"append\"] }' | socat - %s",
+         url,
+         socket
+      )
 
-        log.d("Comando IPC: " .. cmd)
-        hs.execute(cmd)
-        log.i("URL adicionada à playlist do mpv")
-    else
-        -- 5. mpv não está rodando corretamente → iniciar
-        log.w("mpv não está rodando ou socket inválido, iniciando mpv")
+      log.d("Comando IPC: " .. cmd)
+      hs.execute(cmd)
+      log.i("URL adicionada à playlist do mpv")
+   else
+      -- 5. mpv não está rodando corretamente → iniciar
+      log.w("mpv não está rodando ou socket inválido, iniciando mpv")
 
-        local cmd = string.format(
-            "tmux send-keys -t mpv \"mpv --input-ipc-server=%s '%s'\" C-m",
-            socket,
-            url
-        )
+      local cmd = string.format(
+         "tmux send-keys -t mpv \"mpv --input-ipc-server=%s '%s'\" C-m",
+         socket,
+         url
+      )
 
-        log.d("Comando tmux: " .. cmd)
-        hs.execute(cmd)
-        log.i("mpv iniciado na sessão tmux")
-    end
+      log.d("Comando tmux: " .. cmd)
+      hs.execute(cmd)
+      log.i("mpv iniciado na sessão tmux")
+   end
 end
 local mouseTap = nil
 local currentMouseDown = {}
 
---TODO: implementar long press 
---TODO: implementar double click 
+--TODO: implementar long press
+--TODO: implementar double click
 --TODO: scroll do mouse
 function mouse(config)
-	mouseTap = hs.eventtap.new(
-		{ hs.eventtap.event.types.otherMouseDown, hs.eventtap.event.types.otherMouseUp },
-		function(e)
-			local btn = e:getProperty(hs.eventtap.event.properties.mouseEventButtonNumber)
-			local bName = "b" .. btn
-			local eventType = e:getType()
+   mouseTap = hs.eventtap.new(
+      { hs.eventtap.event.types.otherMouseDown, hs.eventtap.event.types.otherMouseUp },
+      function(e)
+         local btn = e:getProperty(hs.eventtap.event.properties.mouseEventButtonNumber)
+         local bName = "b" .. btn
+         local eventType = e:getType()
 
-			local m = ""
-			if eventType == hs.eventtap.event.types.otherMouseDown then
-				m = "mouseDown"
-			elseif eventType == hs.eventtap.event.types.otherMouseUp then
-				m = "mouseUp"
-			else
-				m = eventType
-			end
-			if m == "mouseDown" then
-				currentMouseDown[bName] = true
-				hs.printf("Mouse down = %s", bName)
+         local m = ""
+         if eventType == hs.eventtap.event.types.otherMouseDown then
+            m = "mouseDown"
+         elseif eventType == hs.eventtap.event.types.otherMouseUp then
+            m = "mouseUp"
+         else
+            m = eventType
+         end
+         if m == "mouseDown" then
+            currentMouseDown[bName] = true
+            hs.printf("Mouse down = %s", bName)
 
-				return false
-			end
-			if m == "mouseUp" then
-				if currentMouseDown[bName] then
-					hs.printf("Mouse up = %s", bName)
-					currentMouseDown[bName] = nil
-				end
-				local c = (config[bName] or {})
-				local buttonAloneFunc = c[1] or nil
-		
-				if buttonAloneFunc then
-					hs.printf("buttonAloneFunc = %s", bName)
-					local press = c["press"] or nil
-					if press and currentMouseDown[press] == nil then						
-						return false
-					end
-					buttonAloneFunc()
-					return true
-				else
-					local frontApp = hs.application.frontmostApplication():name()
-					local conf = (config[frontApp] or {})
-					local button = conf[bName] or {}
-					local func = button[1] or nil
-					local c = button["c"] or nil
+            return false
+         end
+         if m == "mouseUp" then
+            if currentMouseDown[bName] then
+               hs.printf("Mouse up = %s", bName)
+               currentMouseDown[bName] = nil
+            end
+            local c = (config[bName] or {})
+            local buttonAloneFunc = c[1] or nil
 
-					-- hs.printf("teste = %s", c)
+            if buttonAloneFunc then
+               hs.printf("buttonAloneFunc = %s", bName)
+               local press = c["press"] or nil
+               if press and currentMouseDown[press] == nil then
+                  return false
+               end
+               buttonAloneFunc()
+               return true
+            else
+               local frontApp = hs.application.frontmostApplication():name()
+               local conf = (config[frontApp] or {})
+               local button = conf[bName] or {}
+               local func = button[1] or nil
+               local c = button["c"] or nil
 
-					if func then
-						local press = button["press"] or nil
-						if press and currentMouseDown[press] == nil then						
-							return false
-						end
-						func()
-						return true
-					else
-						-- hs.printf("button = %s", bName)
-					end
-				end
-			end
-			return false
-		end
-	)
+               -- hs.printf("teste = %s", c)
 
-	mouseTap:start()
+               if func then
+                  local press = button["press"] or nil
+                  if press and currentMouseDown[press] == nil then
+                     return false
+                  end
+                  func()
+                  return true
+               else
+                  -- hs.printf("button = %s", bName)
+               end
+            end
+         end
+         return false
+      end
+   )
+
+   mouseTap:start()
 end
-
-
-
 
 function checkYoutubeLinkUnderMouse()
-	local mousePoint = hs.mouse.absolutePosition()
-	local safari = hs.application.find("Safari")
-	if not safari then
-		hs.alert.show("Safari não está aberto")
-		return
-	end
-	local win = safari:focusedWindow() or safari:mainWindow()
-	if not win then
-		hs.alert.show("Nenhuma janela do Safari ativa")
-		return
-	end
-	local axApp = hs.axuielement.applicationElement(safari)
-	if not axApp then
-		hs.alert.show("Acessibilidade não disponível para o Safari")
-		return
-	end
-	local elem = axApp:elementAtPosition(mousePoint.x, mousePoint.y)
-	if not elem then
-		hs.alert.show("Nenhum elemento sob o mouse")
-		return
-	end
-	-- Sobe na hierarquia até encontrar um AXURL
-	local current = elem
-	local url = nil
-	while current and not url do
-		-- hs.printf("Elemento atual: %s", hs.inspect.inspect(current:allAttributeValues()))
-		url = current:attributeValue("AXURL")
-		-- hs.printf("URL encontrada: %s", url)
-		if url and type(url.url) == "string" and url.url:match("youtube%.com/watch") then
-			hs.printf("URL encontrada: %s, %s", type(url.url) == "string", url.url:match("youtube%.com/watch"))
-			url = url.url
-			break
-		end
-		current = current:attributeValue("AXParent")
-	end
-	if url and type(url) == "string" and url:match("youtube%.com/watch") then
-		hs.alert.show("Link do YouTube detectado!\n" .. url)
-		-- Aqui você pode chamar sua função para tocar no mpv, ex:
-		-- runCommand("mpv --profile=yt-mid " .. url)
-		-- runCommand("/opt/homebrew/bin/mpv --profile=yt-mid " .. url, function() hs.printf("Tocando link: %s", url) end)
-		-- runCommand([[/opt/homebrew/bin/mpv url]])
-		-- mpv(url)
-
-	else
-		hs.alert.show("Nenhum link do YouTube sob o mouse")
-	end
+   local mousePoint = hs.mouse.absolutePosition()
+   local safari = hs.application.find("Safari")
+   if not safari then
+      hs.alert.show("Safari não está aberto")
+      return
+   end
+   local win = safari:focusedWindow() or safari:mainWindow()
+   if not win then
+      hs.alert.show("Nenhuma janela do Safari ativa")
+      return
+   end
+   local axApp = hs.axuielement.applicationElement(safari)
+   if not axApp then
+      hs.alert.show("Acessibilidade não disponível para o Safari")
+      return
+   end
+   local elem = axApp:elementAtPosition(mousePoint.x, mousePoint.y)
+   if not elem then
+      hs.alert.show("Nenhum elemento sob o mouse")
+      return
+   end
+   -- Sobe na hierarquia até encontrar um AXURL
+   local current = elem
+   local url = nil
+   while current and not url do
+      -- hs.printf("Elemento atual: %s", hs.inspect.inspect(current:allAttributeValues()))
+      url = current:attributeValue("AXURL")
+      -- hs.printf("URL encontrada: %s", url)
+      if url and type(url.url) == "string" and url.url:match("youtube%.com/watch") then
+         hs.printf("URL encontrada: %s, %s", type(url.url) == "string", url.url:match("youtube%.com/watch"))
+         url = url.url
+         break
+      end
+      current = current:attributeValue("AXParent")
+   end
+   if url and type(url) == "string" and url:match("youtube%.com/watch") then
+      hs.alert.show("Link do YouTube detectado!\n" .. url)
+      -- Aqui você pode chamar sua função para tocar no mpv, ex:
+      -- runCommand("mpv --profile=yt-mid " .. url)
+      -- runCommand("/opt/homebrew/bin/mpv --profile=yt-mid " .. url, function() hs.printf("Tocando link: %s", url) end)
+      -- runCommand([[/opt/homebrew/bin/mpv url]])
+      -- mpv(url)
+   else
+      hs.alert.show("Nenhum link do YouTube sob o mouse")
+   end
 end
 
-
 function isPointToLink()
-	local mousePoint = hs.mouse.absolutePosition()
-	local app = hs.application.frontmostApplication()
-	local axApp = hs.axuielement.applicationElement(app)
-		if not axApp then
-		-- hs.alert.show("Acessibilidade não disponível para o " .. app:name())
-		return false
-	end
+   local mousePoint = hs.mouse.absolutePosition()
+   local app = hs.application.frontmostApplication()
+   local axApp = hs.axuielement.applicationElement(app)
+   if not axApp then
+      -- hs.alert.show("Acessibilidade não disponível para o " .. app:name())
+      return false
+   end
 
-	local elem = axApp:elementAtPosition(mousePoint.x, mousePoint.y):attributeValue("AXParent")
-	if not tostring(elem):find('AXLink') then
-		-- hs.alert.show("Nenhum elemento sob o mouse")
-		return  false
-	end
-	return true
+   local elem = axApp:elementAtPosition(mousePoint.x, mousePoint.y):attributeValue("AXParent")
+   if not tostring(elem):find('AXLink') then
+      -- hs.alert.show("Nenhum elemento sob o mouse")
+      return false
+   end
+   return true
 end
 
 bind("t", appHyper, launchAppOrFocus("Teams"))
 bind("p", appHyper, emacsclient)
 bind("x", appHyper, launchAppOrFocus("Xcode"))
+bind("z", appHyper, launchAppOrFocus("Zed"))
 bind("k", appHyper, launchAppOrFocus("Alacritty"))
 bind("e", appHyper, launchAppOrFocus("Sublime text"))
 bind("b", appHyper, launchAppOrFocus("Safari"))
@@ -426,20 +429,20 @@ bind("0", appHyper, taskwarriorTui)
 
 -- binds de moviento de janelas
 bind("r", windowHyper, function()
-	hs.console.clearConsole()
-	hs.reload()
+   hs.console.clearConsole()
+   hs.reload()
 end)
 
-bind("f", windowHyper, hs.grid.maximizeWindow) -- fullscreen
-bind("l", windowHyper, positionWindow({ x = 5, y = 0, w = 5, h = 4 })) -- metade direita
-bind("h", windowHyper, positionWindow({ x = 0, y = 0, w = 5, h = 4 })) -- metade esquerda
+bind("f", windowHyper, hs.grid.maximizeWindow)                          -- fullscreen
+bind("l", windowHyper, positionWindow({ x = 5, y = 0, w = 5, h = 4 }))  -- metade direita
+bind("h", windowHyper, positionWindow({ x = 0, y = 0, w = 5, h = 4 }))  -- metade esquerda
 bind("j", windowHyper, positionWindow({ x = 0, y = 2, w = 10, h = 2 })) -- metade de baixo
 bind("k", windowHyper, positionWindow({ x = 0, y = 0, w = 10, h = 2 })) -- metade de cima
-bind("p", windowHyper, positionWindow({ x = 5, y = 0, w = 5, h = 2 })) -- canto superior direito
-bind("y", windowHyper, positionWindow({ x = 0, y = 0, w = 5, h = 2 })) -- canto superior esquero
-bind("b", windowHyper, positionWindow({ x = 0, y = 2, w = 5, h = 2 })) -- canto inferior esquero
-bind(".", windowHyper, positionWindow({ x = 5, y = 2, w = 5, h = 2 })) -- canto inferior direito
-bind("c", windowHyper, positionWindow({ x = 2, y = 0, w = 5, h = 4 })) -- centrazila no meio
+bind("p", windowHyper, positionWindow({ x = 5, y = 0, w = 5, h = 2 }))  -- canto superior direito
+bind("y", windowHyper, positionWindow({ x = 0, y = 0, w = 5, h = 2 }))  -- canto superior esquero
+bind("b", windowHyper, positionWindow({ x = 0, y = 2, w = 5, h = 2 }))  -- canto inferior esquero
+bind(".", windowHyper, positionWindow({ x = 5, y = 2, w = 5, h = 2 }))  -- canto inferior direito
+bind("c", windowHyper, positionWindow({ x = 2, y = 0, w = 5, h = 4 }))  -- centrazila no meio
 
 bind("-", windowHyper, resizeWindow("up"))
 bind("=", windowHyper, resizeWindow("down"))
@@ -452,90 +455,90 @@ bind("up", moveHyper, moveWindow("up"))
 bind("down", moveHyper, moveWindow("down"))
 --bind para limpar o console do hammerspoon e recarregar a configuração
 bind("r", windowHyper, function()
-	hs.console.clearConsole()
-	hs.reload()
+   hs.console.clearConsole()
+   hs.reload()
 end)
 
-mouse = hs.loadSpoon("MouseHandler")
-mouse:start({
-	Safari = {
-		-- b2 = {
-		-- 	function()
-		-- 		-- TODO: o click fora do link funciona mas se clicar no link precisa abrir ele
-		-- 		if not isPointToLink() then
-		-- 			keyPress("w", { "cmd" })()
-		-- 		end
-		-- 		return true
-		-- 	end,
-		-- },
-		b12 = { click = {LastApp} },
-		b16 = { click = {keyPress("left", { "cmd" })} },
-		b17 = { click = {keyPress("right", { "cmd" })} },
-		b10 = { click = {keyPress("tab", { "ctrl" })} },
-		b11 = { click = {keyPress("tab", { "ctrl", "shift" })} },
-		-- b5 = { checkYoutubeLinkUnderMouse },
-	},
-	Xcode = {
-		b2 =  { click = {keyPress("k", { "cmd" })}},
-		-- b3 = { keyPress("1", { "cmd" }),press = "b9" },
-		-- b4 = { keyPress("8", { "cmd" }),press = "b9" },
-		b4 =  { longPress = {keyPress("r", {"cmd"})}, click = {keyPress(".", {"cmd"})} },
-		b5 =  { click = {Simulator} },
-		-- b5 =   {longPress = true, Simulator},  --- immplementar o hide de um app e o long press
-		b8 =  { click = {Proxyman} },
-		b11 = { click = {keyPress("y", { "cmd" , "shift"})}},
-		b12 = { click = {Safari} },
-		
-		-- b14 = { keyPress("0", { "cmd"}) }, -- recisa implementar o evento de button mouse click com modificadores
-		b16 = { click = {keyPress("0", { "cmd"})} },
-		b17 = { click = {keyPress("f13", { "cmd", "alt" })} },
-	},
-	Simulator = {
-		b2 = {click = {runInSequence({
-				-- saveWindowsLayout, -- TODO:  implementar salvar layout de janelas				
-				Xcode,
-				keyPress("k", {"cmd"}),
-				Simulator
-				-- restoreWindowsLayout -- TODO: implementar restaurar layout de janelas
-			})},
-		},
-		b5 = { click = {Xcode }},
-		b6 = { click = {runInSequence({
-				Xcode, 
-				keyPress(".", { "cmd"}),
-				function()
-					runCommand("xcrun simctl uninstall booted  br.com.uol.batepapo.iphone", function ()
-						hs.alert.show("App desinstalado do simulador!")
-					end)
-				end
-			})}
-		},
-		b8 = { click = {Proxyman }},
-		b12 = { click = {Safari }},
-		b16 = { click = {moveAndResizeWindow(0.01, 0.05, 0.25, 0.5)}},
-		b17 = { click = {moveAndResizeWindow(0.88, 0.05, 0.4, 0.5)}},
-
-	},
-	Hammerspoon = {
-		b3 = { click = {
-			hs.spaces.toggleMissionControl, press = "b9"
-		}},
-		b4 = { longPress = {
-			function ()
-				hs.alert.show("reload and clearConsole")
-				hs.console.clearConsole()
-				-- hs.reload()
-			end
-		}, click = {function ()
-				hs.alert.show("clearConsole")
-				hs.console.clearConsole()
-			end}, doubleClick = {
-				function ()
-				hs.alert.show("b4 doubleClick")
-			end
-			} 
-		},
-	},
-})
-
-
+-- mouse = hs.loadSpoon("MouseHandler")
+-- mouse:start({
+-- 	Safari = {
+-- 		-- b2 = {
+-- 		-- 	function()
+-- 		-- 		-- TODO: o click fora do link funciona mas se clicar no link precisa abrir ele
+-- 		-- 		if not isPointToLink() then
+-- 		-- 			keyPress("w", { "cmd" })()
+-- 		-- 		end
+-- 		-- 		return true
+-- 		-- 	end,
+-- 		-- },
+-- 		b12 = { click = {LastApp} },
+-- 		b16 = { click = {keyPress("left", { "cmd" })} },
+-- 		b17 = { click = {keyPress("right", { "cmd" })} },
+-- 		b10 = { click = {keyPress("tab", { "ctrl" })} },
+-- 		b11 = { click = {keyPress("tab", { "ctrl", "shift" })} },
+-- 		-- b5 = { checkYoutubeLinkUnderMouse },
+-- 	},
+-- 	Xcode = {
+-- 		b2 =  { click = {keyPress("k", { "cmd" })}},
+-- 		-- b3 = { keyPress("1", { "cmd" }),press = "b9" },
+-- 		-- b4 = { keyPress("8", { "cmd" }),press = "b9" },
+-- 		b4 =  { longPress = {keyPress("r", {"cmd"})}, click = {keyPress(".", {"cmd"})} },
+-- 		b5 =  { click = {Simulator} },
+-- 		-- b5 =   {longPress = true, Simulator},  --- immplementar o hide de um app e o long press
+-- 		b8 =  { click = {Proxyman} },
+-- 		b11 = { click = {keyPress("y", { "cmd" , "shift"})}},
+-- 		b12 = { click = {Safari} },
+--
+-- 		-- b14 = { keyPress("0", { "cmd"}) }, -- recisa implementar o evento de button mouse click com modificadores
+-- 		b16 = { click = {keyPress("0", { "cmd"})} },
+-- 		b17 = { click = {keyPress("f13", { "cmd", "alt" })} },
+-- 	},
+-- 	Simulator = {
+-- 		b2 = {click = {runInSequence({
+-- 				-- saveWindowsLayout, -- TODO:  implementar salvar layout de janelas
+-- 				Xcode,
+-- 				keyPress("k", {"cmd"}),
+-- 				Simulator
+-- 				-- restoreWindowsLayout -- TODO: implementar restaurar layout de janelas
+-- 			})},
+-- 		},
+-- 		b5 = { click = {Xcode }},
+-- 		b6 = { click = {runInSequence({
+-- 				Xcode,
+-- 				keyPress(".", { "cmd"}),
+-- 				function()
+-- 					runCommand("xcrun simctl uninstall booted  br.com.uol.batepapo.iphone", function ()
+-- 						hs.alert.show("App desinstalado do simulador!")
+-- 					end)
+-- 				end
+-- 			})}
+-- 		},
+-- 		b8 = { click = {Proxyman }},
+-- 		b12 = { click = {Safari }},
+-- 		b16 = { click = {moveAndResizeWindow(0.01, 0.05, 0.25, 0.5)}},
+-- 		b17 = { click = {moveAndResizeWindow(0.88, 0.05, 0.4, 0.5)}},
+--
+-- 	},
+-- 	Hammerspoon = {
+-- 		b3 = { click = {
+-- 			hs.spaces.toggleMissionControl, press = "b9"
+-- 		}},
+-- 		b4 = { longPress = {
+-- 			function ()
+-- 				hs.alert.show("reload and clearConsole")
+-- 				hs.console.clearConsole()
+-- 				-- hs.reload()
+-- 			end
+-- 		}, click = {function ()
+-- 				hs.alert.show("clearConsole")
+-- 				hs.console.clearConsole()
+-- 			end}, doubleClick = {
+-- 				function ()
+-- 				hs.alert.show("b4 doubleClick")
+-- 			end
+-- 			}
+-- 		},
+-- 	},
+-- })
+--
+--
