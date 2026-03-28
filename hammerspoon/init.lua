@@ -2,6 +2,8 @@ hs.loadSpoon("SpoonInstall")
 Install = spoon.SpoonInstall
 -- Install:andUse("GridTile")
 
+require("hs.ipc")
+
 windowHyper = { 'shift', 'alt', 'ctrl' }
 appHyper = { 'cmd', 'alt', 'ctrl', 'shift' }
 mouseHyper = { 'cmd', 'alt', 'ctrl', 'shift' }
@@ -117,6 +119,10 @@ end
 
 -- move uma janela para a posição position e redimensiona para size
 
+function alert()
+   hs.alert.show("Hello, Hammerspoon!")
+end
+
 -- x, y, w, h devem ser valores entre 0 e 1 (porcentagem da tela)
 function moveAndResizeWindow(x, y, w, h)
    return function()
@@ -131,6 +137,14 @@ function moveAndResizeWindow(x, y, w, h)
             h = frame.h * h
          })
       end
+   end
+end
+
+function nextMonitor()
+   return function()
+      local app = hs.window.focusedWindow()
+      app:moveToScreen(app:screen():next())
+      -- app:maximize()
    end
 end
 
@@ -418,7 +432,9 @@ end
 bind("t", appHyper, launchAppOrFocus("Teams"))
 bind("p", appHyper, emacsclient)
 bind("x", appHyper, launchAppOrFocus("Xcode"))
-bind("z", appHyper, launchAppOrFocus("Zed"))
+-- bind("z", appHyper, launchAppOrFocus("Zed"))
+bind("z", appHyper, launchAppOrFocus("Zed Preview"))
+bind("v", appHyper, launchAppOrFocus("Visual Studio Code"))
 bind("k", appHyper, launchAppOrFocus("Alacritty"))
 bind("e", appHyper, launchAppOrFocus("Sublime text"))
 bind("b", appHyper, launchAppOrFocus("Safari"))
@@ -453,92 +469,74 @@ bind("right", moveHyper, moveWindow("right"))
 bind("left", moveHyper, moveWindow("left"))
 bind("up", moveHyper, moveWindow("up"))
 bind("down", moveHyper, moveWindow("down"))
+
+bind("f18", windowHyper, nextMonitor())
 --bind para limpar o console do hammerspoon e recarregar a configuração
 bind("r", windowHyper, function()
    hs.console.clearConsole()
    hs.reload()
 end)
 
--- mouse = hs.loadSpoon("MouseHandler")
--- mouse:start({
--- 	Safari = {
--- 		-- b2 = {
--- 		-- 	function()
--- 		-- 		-- TODO: o click fora do link funciona mas se clicar no link precisa abrir ele
--- 		-- 		if not isPointToLink() then
--- 		-- 			keyPress("w", { "cmd" })()
--- 		-- 		end
--- 		-- 		return true
--- 		-- 	end,
--- 		-- },
--- 		b12 = { click = {LastApp} },
--- 		b16 = { click = {keyPress("left", { "cmd" })} },
--- 		b17 = { click = {keyPress("right", { "cmd" })} },
--- 		b10 = { click = {keyPress("tab", { "ctrl" })} },
--- 		b11 = { click = {keyPress("tab", { "ctrl", "shift" })} },
--- 		-- b5 = { checkYoutubeLinkUnderMouse },
--- 	},
--- 	Xcode = {
--- 		b2 =  { click = {keyPress("k", { "cmd" })}},
--- 		-- b3 = { keyPress("1", { "cmd" }),press = "b9" },
--- 		-- b4 = { keyPress("8", { "cmd" }),press = "b9" },
--- 		b4 =  { longPress = {keyPress("r", {"cmd"})}, click = {keyPress(".", {"cmd"})} },
--- 		b5 =  { click = {Simulator} },
--- 		-- b5 =   {longPress = true, Simulator},  --- immplementar o hide de um app e o long press
--- 		b8 =  { click = {Proxyman} },
--- 		b11 = { click = {keyPress("y", { "cmd" , "shift"})}},
--- 		b12 = { click = {Safari} },
---
--- 		-- b14 = { keyPress("0", { "cmd"}) }, -- recisa implementar o evento de button mouse click com modificadores
--- 		b16 = { click = {keyPress("0", { "cmd"})} },
--- 		b17 = { click = {keyPress("f13", { "cmd", "alt" })} },
--- 	},
--- 	Simulator = {
--- 		b2 = {click = {runInSequence({
--- 				-- saveWindowsLayout, -- TODO:  implementar salvar layout de janelas
--- 				Xcode,
--- 				keyPress("k", {"cmd"}),
--- 				Simulator
--- 				-- restoreWindowsLayout -- TODO: implementar restaurar layout de janelas
--- 			})},
--- 		},
--- 		b5 = { click = {Xcode }},
--- 		b6 = { click = {runInSequence({
--- 				Xcode,
--- 				keyPress(".", { "cmd"}),
--- 				function()
--- 					runCommand("xcrun simctl uninstall booted  br.com.uol.batepapo.iphone", function ()
--- 						hs.alert.show("App desinstalado do simulador!")
--- 					end)
--- 				end
--- 			})}
--- 		},
--- 		b8 = { click = {Proxyman }},
--- 		b12 = { click = {Safari }},
--- 		b16 = { click = {moveAndResizeWindow(0.01, 0.05, 0.25, 0.5)}},
--- 		b17 = { click = {moveAndResizeWindow(0.88, 0.05, 0.4, 0.5)}},
---
--- 	},
--- 	Hammerspoon = {
--- 		b3 = { click = {
--- 			hs.spaces.toggleMissionControl, press = "b9"
--- 		}},
--- 		b4 = { longPress = {
--- 			function ()
--- 				hs.alert.show("reload and clearConsole")
--- 				hs.console.clearConsole()
--- 				-- hs.reload()
--- 			end
--- 		}, click = {function ()
--- 				hs.alert.show("clearConsole")
--- 				hs.console.clearConsole()
--- 			end}, doubleClick = {
--- 				function ()
--- 				hs.alert.show("b4 doubleClick")
--- 			end
--- 			}
--- 		},
--- 	},
--- })
---
---
+local mouse = hs.loadSpoon("MouseHandler")
+
+mouse:start2({
+   b14             = { click = { hs.spaces.toggleMissionControl } },
+   Hammerspoon     = {
+      b14 = { click = { keyPress("1") } },
+   },
+   Safari          = {
+      b12 = { click = { LastApp } },
+      b15 = { click = { keyPress("left", { "cmd" }) } },
+      b16 = { click = { keyPress("right", { "cmd" }) } },
+      b9 = { click = { keyPress("tab", { "ctrl" }) } },
+      b10 = { click = { keyPress("tab", { "ctrl", "shift" }) } },
+      -- b5 = { checkYoutubeLinkUnderMouse },
+   },
+   ["Zed Preview"] = {
+      b15 = { click = { keyPress("b", { "cmd" }) } },
+      b16 = { click = { keyPress("r", { "cmd" }) } },
+   },
+   Xcode           = {
+      b2 = { click = { keyPress("k", { "cmd" }) } },
+      -- b3 = { keyPress("1", { "cmd" }),press = "b9" },
+      -- b4 = { keyPress("8", { "cmd" }),press = "b9" },
+      b4 = { longPress = { keyPress("r", { "cmd" }) }, click = { keyPress(".", { "cmd" }) } },
+      b5 = { click = { Simulator } },
+      -- b5 =   {longPress = true, Simulator},  --- immplementar o hide de um app e o long press
+      b8 = { click = { Proxyman } },
+      b11 = { click = { keyPress("y", { "cmd", "shift" }) } },
+      b12 = { click = { Safari } },
+
+      -- b14 = { keyPress("0", { "cmd"}) }, -- recisa implementar o evento de button mouse click com modificadores
+      b16 = { click = { keyPress("0", { "cmd" }) } },
+      b17 = { click = { keyPress("f13", { "cmd", "alt" }) } },
+   },
+   Simulator       = {
+      b2 = {
+         click = { runInSequence({
+            -- saveWindowsLayout, -- TODO:  implementar salvar layout de janelas
+            Xcode,
+            keyPress("k", { "cmd" }),
+            Simulator
+            -- restoreWindowsLayout -- TODO: implementar restaurar layout de janelas
+         }) },
+      },
+      b5 = { click = { Xcode } },
+      b6 = {
+         click = { runInSequence({
+            Xcode,
+            keyPress(".", { "cmd" }),
+            function()
+               runCommand("xcrun simctl uninstall booted  br.com.uol.batepapo.iphone", function()
+                  hs.alert.show("App desinstalado do simulador!")
+               end)
+            end
+         }) }
+      },
+      b8 = { click = { Proxyman } },
+      b12 = { click = { Safari } },
+      b16 = { click = { moveAndResizeWindow(0.01, 0.05, 0.25, 0.5) } },
+      b17 = { click = { moveAndResizeWindow(0.88, 0.05, 0.4, 0.5) } },
+
+   },
+})
