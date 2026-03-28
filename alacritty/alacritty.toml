@@ -1,26 +1,26 @@
 # hide_cursor_when_typing = true
 
-[colors.cursor]
-cursor = "#528bff"
-text = "CellBackground"
-
-[colors.normal]
-black = "#5c6370"
-blue = "#61afef"
-cyan = "#56b6c2"
-green = "#98c379"
-magenta = "#c678dd"
-red = "#e06c75"
-white = "#828997"
-yellow = "#e5c07b"
-
-[colors.primary]
-background = "#000000"
-foreground = "#abb2bf"
-
-[colors.selection]
-background = "#3e4451"
-text = "CellForeground"
+# [colors.cursor]
+# cursor = "#528bff"
+# text = "CellBackground"
+#
+# [colors.normal]
+# black = "#5c6370"
+# blue = "#61afef"
+# cyan = "#56b6c2"
+# green = "#98c379"
+# magenta = "#c678dd"
+# red = "#e06c75"
+# white = "#828997"
+# yellow = "#e5c07b"
+#
+# [colors.primary]
+# background = "#000000"
+# foreground = "#abb2bf"
+#
+# [colors.selection]
+# background = "#3e4451"
+# text = "CellForeground"
 
 [env]
 TERM = "xterm-256color"
@@ -195,6 +195,16 @@ mods = "Alt"
 chars = "\u001Bd"
 key = "D"
 mods = "Alt"
+
+[[keyboard.bindings]]
+chars = "\u001Bb\u001Br"
+key = "S"
+mods = "Control|Shift"
+
+[[keyboard.bindings]]
+chars = "\u001Bb\u001Bm"
+key = "M"
+mods = "Control|Shift"
 
 [selection]
 save_to_clipboard = true
