@@ -11,6 +11,8 @@ moveHyper = { 'alt', 'cmd' }
 
 
 lastWindow = nil
+-- Usa hs.application.watcher para monitorar o app em primeiro plano e atualizar lastOpenedApp
+lastOpenedApp = nil
 
 function Hammerspoon() launchAppOrFocus("Hammerspoon")() end
 
@@ -24,11 +26,6 @@ function Alacritty() launchAppOrFocus("Alacritty")() end
 
 function Proxyman() launchAppOrFocus("Proxyman")() end
 
-function LastApp()
-   if LastActivatedApp then
-      LastActivatedApp:activate()
-   end
-end
 
 hs.mouse.setAbsolutePosition = true
 hs.window.animationDuration = 0.1
@@ -49,13 +46,34 @@ hs.alert.defaultStyle = {
 }
 
 
-LastActivatedApp = nil
+
+local function appWatcherCallback(appName, eventType, appObject)
+   if eventType == hs.application.watcher.deactivated then
+      -- Quando um app perde o foco, salva como o último app aberto
+      lastOpenedApp = appName
+      hs.printf("Aplicativo perdeu o foco: %s", appName)
+   end
+end
+
+local appWatcher = hs.application.watcher.new(appWatcherCallback)
+appWatcher:start()
 
 
 
 function bind(key, hyper, func)
    hs.hotkey.bind(hyper, key, func)
 end
+
+function lastApp()
+   return function()
+      if lastOpenedApp ~= nil then
+         hs.application.launchOrFocus(lastOpenedApp)
+      end
+   end
+end
+
+
+
 
 -- função que dispara um keypress
 -- parametro key é a tecla que sera pressionada
@@ -478,14 +496,15 @@ bind("r", windowHyper, function()
 end)
 
 local mouse = hs.loadSpoon("MouseHandler")
-
+mouse.debug = true
 mouse:start2({
+   b6             = { click = { lastApp(), press = "b17" } },
    b14             = { click = { hs.spaces.toggleMissionControl } },
    Hammerspoon     = {
       b14 = { click = { keyPress("1") } },
    },
    Safari          = {
-      b12 = { click = { LastApp } },
+      b2 = { click = { keyPress("w", { "cmd" }) } },
       b15 = { click = { keyPress("left", { "cmd" }) } },
       b16 = { click = { keyPress("right", { "cmd" }) } },
       b9 = { click = { keyPress("tab", { "ctrl" }) } },
@@ -493,6 +512,8 @@ mouse:start2({
       -- b5 = { checkYoutubeLinkUnderMouse },
    },
    ["Zed Preview"] = {
+      b3 = { click = { keyPress("o", { "ctrl" }) } },
+      b4 = { click = { keyPress("i", { "ctrl" }) } },
       b15 = { click = { keyPress("b", { "cmd" }) } },
       b16 = { click = { keyPress("r", { "cmd" }) } },
    },
