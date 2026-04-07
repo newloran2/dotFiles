@@ -25,6 +25,33 @@ hs.grid.ui.showExtraKeys = false
 hs.grid.setGrid('10x4')
 hs.grid.ui.textSize = 30
 
+-- função que executa uma serie de funções em sequencia
+-- posso passar um tempo para esperar entre cada função
+local function runInSequence(funcs, delay)
+   if delay == nil then
+      return function()
+         hs.printf("Executando funções em sequência sem delay")
+         for _, func in ipairs(funcs) do
+            hs.printf("Executando função %s", func)
+            func()
+         end
+      end
+   end
+   return function()
+      hs.printf("Executando funções em sequência com delay de %f segundos", delay)
+      for i, func in ipairs(funcs) do
+         hs.timer.doAfter(delay, func)
+      end
+   end
+end
+
+-- função que dispara um keypress
+-- parametro key é a tecla que sera pressionada
+-- parametro mods são os modificadores que devem ser pressionados junto com a tecla
+local function keyPress(key, mods)
+   return function() hs.eventtap.keyStroke(mods, key) end
+end
+
 local function lastApp()
    return function()
       if lastOpenedApp ~= nil then
@@ -49,7 +76,7 @@ end
 
 
 
-local function positionWindow(x, y, w, h)
+function positionWindow(x, y, w, h)
    -- o posiocionamento funciona da seguinte forma
    -- o gid configurado sendo 9x4
    -- x pode ser de 0 a 9 se passar do tamanho maximo considera o tamanho maximo
@@ -76,7 +103,7 @@ local function resizeWindow(direction)
    end
 end
 
-local function moveWindow(direction)
+function moveWindow(direction)
    return function()
       local win = hs.window.focusedWindow()
       if direction == "up" then
@@ -92,7 +119,7 @@ local function moveWindow(direction)
 end
 
 -- x, y, w, h devem ser valores entre 0 e 1 (porcentagem da tela)
-local function moveAndResizeWindow(x, y, w, h)
+function moveAndResizeWindow(x, y, w, h)
    return function()
       local win = hs.window.focusedWindow()
       if win then
@@ -136,6 +163,45 @@ local function launchAppOrFocus(app)
       hs.application.launchOrFocus(app)
    end
 end
+
+
+local function launchOrCycle(appName)
+   return function()
+      local app = hs.application.get(appName)
+
+      if not app then
+         hs.application.launchOrFocus(appName)
+         return
+      end
+
+      if not app:isFrontmost() then
+         app:activate()
+         return
+      end
+
+      local allWindows = hs.window.orderedWindows()
+      local appWindows = {}
+
+      for _, win in ipairs(allWindows) do
+         if win:application():name() == appName and win:isStandard() then
+            table.insert(appWindows, win)
+         end
+      end
+
+      if #appWindows <= 1 then return end
+
+      local current = hs.window.frontmostWindow()
+
+      for i, win in ipairs(appWindows) do
+         if win:id() == current:id() then
+            local nextIndex = (i % #appWindows) + 1
+            appWindows[nextIndex]:focus()
+            return
+         end
+      end
+   end
+end
+
 local function emacsclient()
    hs.alert.show("Abrindo Emacs...")
    hs.execute("~/.hammerspoon/emacsclientOrEmacs.sh")
@@ -152,77 +218,147 @@ local function bottomRight() positionWindow({ x = 5, y = 2, w = 5, h = 2 })() en
 local function center() positionWindow({ x = 2, y = 0, w = 5, h = 4 })() end
 local function maximize() positionWindow({ x = 0, y = 0, w = 10, h = 10 })() end
 
+local function execute(command)
+   return function()
+      hs.execute(command)
+   end
+end
 
 local shortcuts = hs.loadSpoon("EShortcuts")
+shortcuts.debug = false
 shortcuts:bind {
    ["*"] = {
-      { mods = { "cmd" },   key = "f13",  fn = hs.spaces.toggleMissionControl },
+      -- { mods = windowHyper, key = "f",    action = maximize },
+      { mods = windowHyper, key = "h",     action = left },
+      { mods = windowHyper, key = "l",     action = right },
+      { mods = { "cmd" },   key = "pad0",  action = left },
+      { mods = { "shift" }, key = "pad2",  action = right },
+      { mods = windowHyper, key = "k",     action = up },
+      { mods = windowHyper, key = "j",     action = down },
+      { mods = windowHyper, key = "y",     action = topLeft },
+      { mods = windowHyper, key = "p",     action = topRight },
+      { mods = windowHyper, key = "b",     action = bottomLeft },
+      { mods = windowHyper, key = ".",     action = bottomRight },
+      { mods = windowHyper, key = "c",     action = center },
+      { mods = windowHyper, key = "f",     action = maximize },
 
-      { mods = windowHyper, key = "f",    fn = maximize },
-      { mods = windowHyper, key = "h",    fn = left },
-      { mods = windowHyper, key = "l",    fn = right },
-      { mods = { "cmd" },   key = "pad0", fn = left },
-      { mods = { "shift" }, key = "pad2", fn = right },
-      { mods = windowHyper, key = "k",    fn = up },
-      { mods = windowHyper, key = "j",    fn = down },
-      { mods = windowHyper, key = "y",    fn = topLeft },
-      { mods = windowHyper, key = "p",    fn = topRight },
-      { mods = windowHyper, key = "b",    fn = bottomLeft },
-      { mods = windowHyper, key = ".",    fn = bottomRight },
-      { mods = windowHyper, key = "c",    fn = center },
+      { mods = { "cmd" },   key = "f13",   action = { shift = hs.spaces.toggleMissionControl } },
+      { mods = { "cmd" },   key = "f14",   action = { shift = left } },
+      { mods = { "cmd" },   key = "f15",   action = { shift = right } },
+      { mods = { "cmd" },   key = "f16",   action = { shift = maximize } },
 
-      { mods = appHyper,    key = "p",    fn = emacsclient },
-      { mods = appHyper,    key = "t",    fn = launchAppOrFocus("Teams") },
-      { mods = appHyper,    key = "x",    fn = launchAppOrFocus("Xcode") },
-      { mods = appHyper,    key = "z",    fn = launchAppOrFocus("Zed Preview") },
-      { mods = appHyper,    key = "v",    fn = launchAppOrFocus("Visual Studio Code") },
-      { mods = appHyper,    key = "k",    fn = launchAppOrFocus("Alacritty") },
-      { mods = appHyper,    key = "b",    fn = launchAppOrFocus("Safari") },
-      { mods = appHyper,    key = "m",    fn = launchAppOrFocus("Activity Monitor") },
-      { mods = appHyper,    key = "i",    fn = launchAppOrFocus("Mail") },
-      { mods = appHyper,    key = "=",    fn = launchAppOrFocus("Proxyman") },
-      { mods = windowHyper, key = "g",    fn = hs.grid.show },
-      { mods = windowHyper, key = "r", fn = function()
+
+
+      { mods = windowHyper, key = "right", action = moveWindow("right") },
+      { mods = windowHyper, key = "left",  action = moveWindow("left") },
+      { mods = windowHyper, key = "up",    action = moveWindow("up") },
+      { mods = windowHyper, key = "down",  action = moveWindow("down") },
+      -- { mods = windowHyper, key = "=",    action = nextMonitor() },
+
+      { mods = appHyper,    key = "p",     action = emacsclient },
+      { mods = appHyper,    key = "t",     action = launchAppOrFocus("Teams") },
+      { mods = appHyper,    key = "a",     action = launchAppOrFocus("Android Studio") },
+      { mods = appHyper,    key = "x",     action = launchAppOrFocus("Xcode") },
+      { mods = appHyper,    key = "z",     action = launchAppOrFocus("Zed Preview") },
+      { mods = appHyper,    key = "v",     action = launchAppOrFocus("Visual Studio Code") },
+      { mods = appHyper,    key = "k",     action = launchAppOrFocus("Alacritty") },
+      { mods = appHyper,    key = "b",     action = launchAppOrFocus("Safari") },
+      { mods = appHyper,    key = "m",     action = launchAppOrFocus("Activity Monitor") },
+      { mods = appHyper,    key = "i",     action = launchAppOrFocus("Mail") },
+      { mods = appHyper,    key = "=",     action = launchAppOrFocus("Proxyman") },
+      { mods = windowHyper, key = "g",     action = hs.grid.show },
+      { mods = windowHyper, key = "r", action = function()
          hs.console.clearConsole()
          hs.reload()
       end,
       },
    },
+   ["Proxyman"] = {
+      { key = "f16", action = launchAppOrFocus("Simulator") },
+      { key = "f17", action = launchAppOrFocus("Xcode") },
+      { key = "pad1", action = runInSequence({
+         keyPress("a", { "cmd" }),
+         keyPress("k", { "cmd" }),
+      }, 0.2) },
+   },
    ["Safari"] = {
-      { key = "f13",  press = { "tab", { "ctrl", "shift" } } },
-      { key = "f14",  press = { "tab", { "ctrl" } } },
-      { key = "f15",  press = { "r", { "cmd" } } },
-      { key = "f16",  press = { "t", { "cmd", "shift" } } },
-      { key = "pad0", press = { "left", { "cmd" } } },
-      { key = "pad1", press = { "w", { "cmd" } } },
-      { key = "pad2", press = { "right", { "cmd" } } },
-      { key = "f20", press = {
-         { "right", { "cmd" } },
-         10,
-         { "right", { "cmd" } },
-      } },
+      { key = "f13",  action = { press = { "tab", { "ctrl", "shift" } } } },
+      { key = "f14",  action = { press = { "tab", { "ctrl" } } } },
+      { key = "f15",  action = { press = { "r", { "cmd" } } } },
+      { key = "f16",  action = { press = { "t", { "cmd", "shift" } } } },
+      { key = "pad0", action = { press = { "left", { "cmd" } } } },
+      { key = "pad1", action = { press = { "w", { "cmd" } } } },
+      { key = "pad2", action = { press = { "right", { "cmd" } } } },
    },
    ["Google Chrome"] = {
-      { key = "f13",  press = { "tab", { "ctrl", "shift" } } },
-      { key = "f14",  press = { "tab", { "ctrl" } } },
-      { key = "f15",  press = { "r", { "cmd" } } },
-      { key = "f16",  press = { "t", { "cmd", "shift" } } },
-      { key = "pad0", press = { "left", { "cmd" } } },
-      { key = "pad1", press = { "w", { "cmd" } } },
-      { key = "pad2", press = { "right", { "cmd" } }, }
+      { key = "f13",  action = { press = { "tab", { "ctrl", "shift" } } } },
+      { key = "f14",  action = { press = { "tab", { "ctrl" } } } },
+      { key = "f15",  action = { press = { "r", { "cmd" } } } },
+      { key = "f16",  action = { press = { "t", { "cmd", "shift" } } } },
+      { key = "pad0", action = { press = { "left", { "cmd" } } } },
+      { key = "pad1", action = { press = { "w", { "cmd" } } } },
+      { key = "pad2", action = { press = { "right", { "cmd" } } } },
    },
    ["Zed Preview"] = {
-      { key = "f13",  press = { "o", { "ctrl" } } },
-      { key = "f14",  press = { "i", { "ctrl" } }, },
-      { key = "f16",  fn = launchAppOrFocus("Simulator") },
-      { key = "pad0", press = { "b", { "cmd" } } },
-      { key = "pad2", press = { "r", { "cmd" } } },
-      { key = "f20", press = {
-         { "r", { "cmd", "shift" } },
-         { "b", { "cmd" } },
-      } },
+      { key = "f13", action = { press = { "o", { "ctrl" } } } },
+      { key = "f14", action = { press = { "i", { "ctrl" } }, } },
+      { key = "f16", action = launchAppOrFocus("Simulator") },
+      { key = "f19", action = { press = { "escape", { "shift" } } } },
+      { mods = { "cmd" },
+         key = "f16",
+         action = {
+            press = { "b", { "cmd" } },
+            double = hs.spaces.toggleMissionControl,
+            shift = { "r", { "cmd" } },
+
+         }
+      },
+      { key = "f20",  action = { press = { "`", { "ctrl", "shift" } } } },
+      { key = "pad0", action = { press = { "b", { "cmd" } } } },
+
+      { key = "pad1", action = runInSequence(
+         {
+            keyPress("`", { "ctrl", "shift" }),
+            keyPress("k", { "cmd" }),
+            keyPress("`", { "ctrl", "shift" }),
+         }),
+      },
+      { key = "pad2", action = { press = { "r", { "cmd" } } } },
+   },
+   ["Xcode"] = {
+      { key = "pad0",     action = { press = { "1", { "cmd", "ctrl" } } } },
+      { key = "pad1",     action = { press = { "k", { "cmd" } } } },
+      { key = "pad2",     action = { press = { "9", { "cmd", "ctrl" } } } },
+      { key = "f13",      action = { press = { "left", { "cmd", "ctrl" } } } },
+      { key = "f14",      action = { press = { "right", { "cmd", "ctrl" } } } },
+      { key = "f16",      action = launchAppOrFocus("Simulator") },
+      { key = "f17",      action = launchAppOrFocus("Proxyman") },
+      { key = "f18",      action = { press = { "r", { "cmd" } } } },
+      { mods = { "cmd" }, key = "f18",                                        action = { press = { ".", { "cmd" } } } },
    },
    ["Simulator"] = {
-      { key = "f16", fn = launchAppOrFocus("Zed Preview") },
+      { key = "f16", action = launchAppOrFocus("Xcode") },
+      { key = "f17", action = launchAppOrFocus("Proxyman") },
+      { key = "f18", action = runInSequence({
+         launchAppOrFocus("Xcode"),
+         keyPress("r", { "cmd" }),
+         launchAppOrFocus("Simulator"),
+      }, 0.2) },
+      { mods = { "cmd" }, key = "f18", action = runInSequence({
+         launchAppOrFocus("Xcode"),
+         keyPress(".", { "cmd" }),
+         launchAppOrFocus("Simulator"),
+      }, 0.2) },
+
+      { key = "pad1", action = runInSequence({
+         launchAppOrFocus("Xcode"),
+         keyPress("k", { "cmd" }),
+         launchAppOrFocus("Simulator"),
+      }, 0.2) },
+
+      -- { key = "f18",  action = execute("~/.local/bin/reload_app_in_ios_emulator USR2") },
+      -- { key = "f18",  action = execute("~/.local/bin/reload_app_in_ios_emulator USR2") },
+      { key = "pad0", action = moveAndResizeWindow(0.005, 0, 1, 0.6) },
+      { key = "pad2", action = moveAndResizeWindow(0.85, 0, 1, 0.6) },
    }
 }
