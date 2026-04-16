@@ -1,7 +1,7 @@
-local apps = import "lib/apps.libsonnet";
-local window = import "lib/window.libsonnet";
-local devices = import "lib/devices.libsonnet";
-local complex = import "lib/complex_modifications.libsonnet";
+local apps = import 'lib/apps.libsonnet';
+local complex = import 'lib/complex_modifications.libsonnet';
+local devices = import 'lib/devices.libsonnet';
+local window = import 'lib/window.libsonnet';
 
 {
   global: {
@@ -10,28 +10,29 @@ local complex = import "lib/complex_modifications.libsonnet";
   },
 
   profiles: [
-  {
+    {
       devices: [
-      devices.naga,
+        devices.naga,
+        devices.naga_mouse,
+        // devices.naga_blue,
       ],
-      name: "Default profile",
+      name: 'Default profile',
       selected: true,
       virtual_hid_keyboard: {
-         indicate_sticky_modifier_keys_state: false,
-         keyboard_type_v2 : "ansi"
+        indicate_sticky_modifier_keys_state: false,
+        keyboard_type_v2: 'ansi',
       },
       complex_modifications: {
         rules: [
-            complex.zed,
-            complex.simulator,
-            complex.proxyman,
-            complex.boosteroid,
-            complex.safari,
-            apps.rule,
-            window.rule,
-
-        ]
-      }
-   }
-  ]
+          complex.zed,
+          complex.simulator,
+          complex.proxyman,
+          complex.boosteroid,
+          complex.safari,
+          apps.rule,
+          window.rule,
+        ],
+      },
+    },
+  ],
 }
