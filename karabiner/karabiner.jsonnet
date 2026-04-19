@@ -14,7 +14,7 @@ local window = import 'lib/window.libsonnet';
       devices: [
         devices.naga,
         devices.naga_mouse,
-        // devices.naga_blue,
+        devices.naga_blue,
       ],
       name: 'Default profile',
       selected: true,

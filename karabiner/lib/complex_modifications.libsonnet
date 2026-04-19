@@ -1,29 +1,53 @@
 local mapper = import 'buttonMapper.libsonnet';
 
 {
-  map(apps, description, maps): {
-    description: description,
-    manipulators: std.flattenArrays([
-      if std.objectHas(m, "double") && m.double then
-        // Passamos os dados do single click se ele existir no objeto
-        mapper.mapDouble(
-            m.from,
-            m.to,
-            m.mods,
-            apps,
-            if std.objectHas(m, "single") then m.single.to else null,
-            if std.objectHas(m, "single") then m.single.mods else null
-        )
-      else
-        [{
-          type: 'basic',
-          conditions: [{ type: "frontmost_application_if", bundle_identifiers: apps }],
-          from: mapper.format_key(m.from, { optional: ['any'] }),
-          to: if std.type(m.to) == "array" then m.to else [mapper.format_key(m.to, m.mods)],
-        }]
-      for m in maps
-    ]),
-  },
+map(apps, description, maps): {
+  description: description,
+  manipulators: std.flattenArrays([
+    // Caso 1: Layer (Segurar botão modificador)
+    if std.objectHas(m, "layer") then
+      mapper.mapLayer(
+        m.layer,
+        mapper.format_key(m.to, m.mods),
+        m.triggers,
+        apps
+      )
+
+    // Caso 2: Double Click
+    else if std.objectHas(m, "double") && m.double then
+      mapper.mapDouble(
+        m.from,
+        m.to,
+        m.mods,
+        apps,
+        if std.objectHas(m, "single") then m.single.to else null,
+        if std.objectHas(m, "single") then m.single.mods else null
+      )
+
+    // Caso 3: Clique Simples
+    else
+      [{
+        type: 'basic',
+        conditions: [{ type: "frontmost_application_if", bundle_identifiers: apps }],
+        // from: mapper.format_key(m.from, { optional: ['any'] }),
+        from: mapper.format_key(m.from),
+        to: if std.type(m.to) == "array" then m.to else [mapper.format_key(m.to, m.mods)],
+      }]
+    for m in maps
+  ]),
+},
+
+default_open_apps():
+{
+   layer: 'button2',
+   to: "button2", mods: [],
+   // Gatilhos enquanto button13 estiver segurado
+   triggers: [
+      { from: 'button13', to:{ shell_command: 'open -a "Proxyman"' } , mods: [] },
+      { from: 'button14', to:{ shell_command: 'open -a "Safari"' } , mods: [] },
+      { from: 'button15', to:{ shell_command: 'open -a "Alacritty"' } , mods: [] },
+   ]
+},
 
 
   // chama de forma instantaea single click
@@ -35,28 +59,60 @@ local mapper = import 'buttonMapper.libsonnet';
    //   to: 'r', mods: ['left_command'],
    //   single: { to: 'w', mods: ['left_command'] }
    // },
-
+   // layer onde segura um botão to e aperta o from
+   // caso o layer seja precionado pressionado e solto apenas o evento de to é disparado
+   // caso seja segurado e apertado o um dos from do triggers o to do triger em questão é disparado
+   // TODO: controlar adequadamente quando o layer for usado juntamente com o double
+   // {
+   //    layer: 'button14',
+   //    to: "i", mods: ['left_control'],
+   //    triggers: [
+   //       { from: 'button1', to: [{key_code: "escape"},{key_code: "left_shift"},{key_code: "backslash"},], mods: [] },
+   //       { from: 'button2', to: [{key_code: "escape"},{key_code: "left_shift"},{key_code: "hyphen"},], mods: [] },
+   //       { from: 'button3', to: 'w', mods: ['left_command'] },
+   //    ]
+   // },
   zed: self.map(
     ['^io\\.zedapp\\.Zed$', '^dev\\.zed\\.Zed-Preview$'],
     'Zed Shortcuts',
     [
+
           {
-            from: 'button5',
-            double: true,
-            to: 'f18', mods: ['left_command'],
-            single: { to: 'f18', mods: [] }
+             layer: 'button6',
+             to: [{ key_code: 'spacebar' }, { key_code: 'e' }, { key_code: 'e' }], mods: [],
+             triggers: [
+                { from: 'button1', to: 'f18', mods: [] },
+                { from: 'button2', to: 'f18', mods: ['left_command'] },
+             ]
           },
-         //  { from: 'button5', to: 'f18', mods: [] },
-         // { from: 'button5', to: 'f18', mods: ['left_command'] },
-         { from: 'button6', to: [{ key_code: 'spacebar' }, { key_code: 'e' }, { key_code: 'e' }], mods: [] },
-         { from: 'button7', to: 'b', mods: ['left_command'] },
-         { from: 'button8', to: 'r', mods: ['left_command'] },
-         { from: 'button9', to: 'escape', mods: ['left_shift'] },
-         // {from:"button10", to: "r", mods: ["left_command"]},
-         { from: 'button10', to: { shell_command: 'open -a "Proxyman"' }, mods: [] },
-         { from: 'button11', to: { shell_command: "open -a 'Simulator'" }, mods: [] },
-         { from: 'button13', to: 'o', mods: ['left_control'] },
-         { from: 'button14', to: 'i', mods: ['left_control'] },
+         {
+            layer: 'button13',
+            to: 'o', mods: ['left_control'],
+            triggers: [
+               { from: 'button2', to: 'r', mods: ['left_command'] },
+               { from: 'button1', to: 'b', mods: ['left_command'] },
+               // { from: 'button3', to: 'w', mods: ['left_command'] },
+            ]
+         },
+         {
+            layer: 'button14',
+            to: "i", mods: ['left_control'],
+            triggers: [
+               { from: 'button1', to: [{pointing_button:"button1"},{key_code: "escape"},{key_code: "left_shift"},{key_code: "backslash"}], mods: [] },
+               { from: 'button2', to: [{pointing_button:"button1"},{key_code: "escape"},{key_code: "left_shift"},{key_code: "hyphen"}], mods: [] },
+               { from: 'button3', to: 'w', mods: ['left_command'] },
+            ]
+         },
+         {
+            layer: 'button15',
+            to: "tab", mods: ['left_command'],
+            triggers: [
+               { from: 'button1', to: { shell_command: 'open -a "Proxyman"' }, mods: [] },
+               { from: 'button2', to: { shell_command: 'open -a "Simulator"' }, mods: [] },
+               { from: 'button3', to: { shell_command: 'open -a "Safari"' }, mods: [] },
+            ]
+         }
+
     ]
   ),
 
@@ -64,8 +120,15 @@ local mapper = import 'buttonMapper.libsonnet';
     ['^com\\.apple\\.iphonesimulator$'],
     'Simulator Shortcuts',
     [
-      { from: 'button11', to: { shell_command: "open -a 'Zed Preview'" }, mods: [] },
-      { from: 'button15', to: { shell_command: 'open -a Proxyman' }, mods: [] },
+      {
+         layer: 'button15',
+         to: 'tab', mods: ['left_command'],
+         triggers: [
+            { from: 'button1', to: { shell_command: 'open -a "Proxyman"' }, mods: [] },
+            { from: 'button2', to: { shell_command: 'open -a "Zed Preview"' }, mods: [] },
+            { from: 'button3', to: { shell_command: 'open -a "Safari"' }, mods: [] },
+         ]
+      }
     ]
   ),
 
@@ -77,8 +140,17 @@ local mapper = import 'buttonMapper.libsonnet';
         { key_code: 'a', modifiers: ['left_command'] },
         { key_code: 'delete_or_backspace' },
       ], mods: [] },
-      { from: 'button10', to: 'tab', mods: ['left_command'] },
-      { from: 'button15', to: { shell_command: 'open -a Simulator' }, mods: [] },
+      {
+         layer: 'button15',
+         to: 'tab', mods: ['left_command'],
+         triggers: [
+            { from: 'button1', to: { shell_command: 'open -a "Smua"' }, mods: [] },
+            { from: 'button2', to: { shell_command: 'open -a "Zed Preview"' }, mods: [] },
+            { from: 'button3', to: { shell_command: 'open -a "Safari"' }, mods: [] },
+         ]
+      }
+      { from: 'button15', to: 'tab', mods: ['left_command']},
+      // { from: 'button15', to: { shell_command: 'open -a Simulator' }, mods: [] },
     ]
   ),
   boosteroid: self.map(
@@ -110,8 +182,7 @@ local mapper = import 'buttonMapper.libsonnet';
       { from: 'button11', to: 'tab', mods: ['left_control'] },
       { from: 'button13', to: 'left_arrow', mods: ['left_command'] },
       { from: 'button14', to: 'right_arrow', mods: ['left_command'] },
-      { from: 'button14', to: 'r', mods: ['left_command'], double: true},
-
+      { from: 'button15', to: 'tab', mods: ['left_command']},
     ]
   ),
 }

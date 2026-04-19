@@ -16,7 +16,7 @@ local win(key, action) =
       win("k", "up"),
       win("f", "fullscreen"),
       win("c", "center"),
-      win("equal_sign", "downRight"),
+      win("period", "downRight"),
       win("b", "downLeft"),
       win("y", "upLeft"),
       win("p", "upRight"),
