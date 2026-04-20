@@ -1,14 +1,10 @@
-local apps = import 'lib/apps.libsonnet';
 local complex = import 'lib/complex_modifications.libsonnet';
 local devices = import 'lib/devices.libsonnet';
-local window = import 'lib/window.libsonnet';
-
 {
   global: {
     enable_notification_window: false,
     show_in_menu_bar: false,
   },
-
   profiles: [
     {
       devices: [
@@ -24,13 +20,8 @@ local window = import 'lib/window.libsonnet';
       },
       complex_modifications: {
         rules: [
-          complex.zed,
-          complex.simulator,
-          complex.proxyman,
-          complex.boosteroid,
-          complex.safari,
-          apps.rule,
-          window.rule,
+            complex.apps, complex.simulator, complex.proxyman, complex.boosteroid,
+            complex.zed, complex.safari, complex.win,
         ],
       },
     },

@@ -1,4 +1,5 @@
 local mapper = import 'buttonMapper.libsonnet';
+local core = import 'core.libsonnet';
 
 {
 map(apps, description, maps): {
@@ -26,29 +27,19 @@ map(apps, description, maps): {
 
     // Caso 3: Clique Simples
     else
-      [{
+    [{
         type: 'basic',
-        conditions: [{ type: "frontmost_application_if", bundle_identifiers: apps }],
-        // from: mapper.format_key(m.from, { optional: ['any'] }),
         from: mapper.format_key(m.from),
         to: if std.type(m.to) == "array" then m.to else [mapper.format_key(m.to, m.mods)],
-      }]
+      } + (
+        // Só adiciona o campo conditions se apps não for null e tiver itens
+        if apps != null && std.type(apps) == 'array' && std.length(apps) > 0 then
+          { conditions: [{ type: "frontmost_application_if", bundle_identifiers: apps }] }
+        else {}
+      )]
     for m in maps
   ]),
 },
-
-default_open_apps():
-{
-   layer: 'button2',
-   to: "button2", mods: [],
-   // Gatilhos enquanto button13 estiver segurado
-   triggers: [
-      { from: 'button13', to:{ shell_command: 'open -a "Proxyman"' } , mods: [] },
-      { from: 'button14', to:{ shell_command: 'open -a "Safari"' } , mods: [] },
-      { from: 'button15', to:{ shell_command: 'open -a "Alacritty"' } , mods: [] },
-   ]
-},
-
 
   // chama de forma instantaea single click
   //{ from: 'button14', to: 'r', mods: ['left_command'] },
@@ -185,4 +176,35 @@ default_open_apps():
       { from: 'button15', to: 'tab', mods: ['left_command']},
     ]
   ),
+
+  win: {
+    rule: {
+      description: "Movimento de janelas",
+      manipulators: [
+        core.win("h", "left"),
+        core.win("l", "right"),
+        core.win("j", "down"),
+        core.win("k", "up"),
+        core.win("f", "fullscreen"),
+        core.win("c", "center"),
+        core.win("period", "downRight"),
+        core.win("b", "downLeft"),
+        core.win("y", "upLeft"),
+        core.win("p", "upRight"),
+      ]
+    }
+  },
+  apps: core.openApps({
+     f: 'Finder',
+     t: 'Teams',
+     x: 'Xcode',
+     z: 'Zed Preview',
+     v: 'Visual Studio Code',
+     k: 'Alacritty',
+     e: 'Sublime Text',
+     b: 'Safari',
+     m: 'Activity Monitor',
+     i: 'Mail',
+     equal_sign: 'Proxyman'
+  })
 }
