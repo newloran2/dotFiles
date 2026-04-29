@@ -14,7 +14,7 @@ local hyper = ["left_command", "left_option", "left_control", "left_shift"];
     modifiers: mods,
   },
 
-  shell(cmd): [{ shell_command: cmd }],
+  shell(cmd): [{shell_command: cmd}],
 
   keyPress(key, mods=[]): [{
     key_code: key,
@@ -30,18 +30,20 @@ local hyper = ["left_command", "left_option", "left_control", "left_shift"];
    openApp(key, app):
       self.basicManipulator(
       self.key(key, { mandatory: hyper }),
-      self.shell('open -a "' + app + '"')
+      if std.startsWith(app, "open") then
+         self.shell(app)
+      else
+         self.shell('open -a "' + app + '"')
       ),
 
    openApps(map):
    {
-     rule: {
        description: 'Abertura de apps',
        manipulators:
          [
            core.openApp(k, map[k])
            for k in std.objectFields(map)
          ],
-     },
    }
+
 }

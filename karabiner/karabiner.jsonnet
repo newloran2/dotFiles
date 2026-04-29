@@ -20,8 +20,14 @@ local devices = import 'lib/devices.libsonnet';
       },
       complex_modifications: {
         rules: [
-            complex.apps, complex.simulator, complex.proxyman, complex.boosteroid,
-            complex.zed, complex.safari, complex.win,
+            complex.simulator,
+            complex.Xcode,
+            complex.proxyman,
+            complex.boosteroid,
+            complex.zed,
+            complex.safari,
+            complex.win,
+            complex.apps,
         ],
       },
     },

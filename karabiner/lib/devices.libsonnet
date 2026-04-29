@@ -27,7 +27,6 @@ local naga_map =  [
     simple_modifications: [
       {
         from: mapper.map(item[0]),
-
         to: [
           mapper.map(item[1]),
         ],
